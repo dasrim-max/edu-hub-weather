@@ -1,0 +1,20 @@
+# site/ 가 바뀌어 main에 올라오면 쌤허브 사이트(Cloudflare Pages)를 다시 빌드한다.
+# 필요한 비밀 값: CF_PAGES_DEPLOY_HOOK (Cloudflare Pages → 설정 → 배포 후크 주소). 없으면 건너뜀.
+name: deploy-site
+on:
+  push:
+    branches: [main]
+    paths: ["site/**"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  rebuild-portal:
+    runs-on: ubuntu-latest
+    env:
+      HOOK: ${{ secrets.CF_PAGES_DEPLOY_HOOK }}
+    steps:
+      - name: 쌤허브 사이트 다시 빌드 요청
+        run: |
+          if [ -z "$HOOK" ]; then echo "CF_PAGES_DEPLOY_HOOK 비밀 값이 없어 건너뜁니다."; exit 0; fi
+          curl -fsS -X POST "$HOOK" > /dev/null && echo "재빌드를 요청했습니다."
