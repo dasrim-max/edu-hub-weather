@@ -148,6 +148,23 @@
   .tab.on{background:var(--ink);color:#fff;border-color:var(--ink);box-shadow:0 3px 0 #0d1720}
   .tab-act{background:var(--accent);color:var(--accent-ink);border:1px solid var(--accent);box-shadow:0 3px 0 #1f5fa8;padding:10px 18px;font-size:17px}
   .tab-act[hidden]{display:none}
+  .roster-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+  .roster-top select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .roster-wrap{overflow:auto;max-height:60vh;border:1px solid var(--line);border-radius:12px}
+  .roster{width:100%;border-collapse:collapse;font-size:15px}
+  .roster th,.roster td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+  .roster th{position:sticky;top:0;background:#f3f7fb;font-weight:700}
+  .roster tr.none td{color:var(--sub)}
+  .roster .yes{color:#1a8a4a;font-weight:700}
+  .roster button{font-family:"Noto Sans KR";font-size:13px;padding:4px 9px;background:#eef3f8;color:var(--ink);box-shadow:none;border-radius:8px}
+  .pick-dlg{border:none;border-radius:18px;padding:20px 20px 16px;width:min(460px,92vw);box-shadow:0 12px 40px rgba(31,45,58,.3)}
+  .pick-dlg::backdrop{background:rgba(31,45,58,.45)}
+  .pick-dlg h3{margin:0 0 6px;font-size:22px}
+  .pick-dlg p{margin:0 0 12px;color:var(--sub);font-size:14px}
+  .pick-list{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow:auto;margin:0 0 12px;padding:2px}
+  .pick-list button{text-align:left;background:#f3f7fb;border:2px solid var(--line);box-shadow:none;font-family:"Noto Sans KR";font-size:16px;padding:12px 14px;color:var(--ink)}
+  .pick-list button small{color:var(--sub);margin-left:6px}
+  .pick-list button:hover{border-color:var(--accent)}
 
   /* ---------- 날씨 미션 상단 바: 자유 탐구와 같은 레이아웃이 되도록 .side 맨 위, 그림 윗줄에 맞춰 배치 ---------- */
   .mission-topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:12px 14px}
@@ -297,7 +314,6 @@
 </style>
 </head>
 <body>
-<div id="bar"></div>
 <div class="wrap">
   <header>
     <div class="h1-row">
@@ -308,7 +324,7 @@
       <button class="tab" data-mode="mission">🎯 날씨 미션</button>
       <button class="tab" data-mode="guess">🔍 날씨 맞추기</button>
       <button class="tab" data-mode="teacher" id="tabTeacher">👩‍🏫 교사 모드</button>
-      <button class="tab-act" type="button" id="btnQuickInvite" hidden title="지금 화면의 활동으로 학생 초대 링크·QR을 바로 만들어요">📱 학생 초대 QR</button>
+      <button class="tab-act" type="button" id="btnQuickInvite" hidden title="앱 전체 학생 초대 링크·QR을 바로 만들어요">📱 학생 초대 QR</button>
     </nav>
   </header>
 
@@ -350,18 +366,22 @@
       <button class="asub on" type="button" data-sub="invite">🔗 미션 선택·초대</button>
       <button class="asub" type="button" data-sub="author" id="subAuthor">📋 미션 출제</button>
       <button class="asub" type="button" data-sub="score">🏆 점수 관리</button>
+      <button class="asub" type="button" data-sub="roster">👥 학생 명단</button>
     </div>
 
     <div id="invitePanel">
       <div class="card tp">
-        <div class="tp-head"><h3>🎯 학생에게 줄 미션 고르기</h3></div>
-        <p style="color:var(--sub);font-size:14px;margin:0 0 12px">공개된 미션 세트를 골라 링크·QR·참여 코드로 나눠 주세요. 우리 반 명단에 있는 학생만 들어올 수 있고, 점수는 선생님 명단의 학생 이름으로 저장돼요.</p>
+        <div class="tp-head"><h3>📱 학생 초대</h3></div>
+        <p style="color:var(--sub);font-size:14px;margin:0 0 12px">앱 전체로 링크·QR·참여 코드를 한 번만 만들어 나눠 주세요. 학생은 들어와서 자유 탐구, 날씨 미션(미션 세트 고르기), 날씨 맞추기를 직접 골라요. 우리 반 명단에 있는 학생만 들어올 수 있고, 점수는 선생님 명단의 학생 이름으로 저장돼요.</p>
+        <div class="mc-btns" style="flex-direction:column;gap:10px;margin-top:8px">
+          <button class="btn-make" id="btnInviteApp" style="width:100%">📱 학생 초대 (링크·QR)</button>
+        </div>
+      </div>
+      <div class="card tp">
+        <div class="tp-head"><h3>🎯 미션 세트 미리보기</h3></div>
+        <p style="color:var(--sub);font-size:14px;margin:0 0 12px">‘날씨 미션’ 탭에서 선생님이 미리 볼 미션 세트를 골라요. 학생은 들어와서 직접 골라요.</p>
         <label class="fld"><span>미션 세트</span><select id="setSel"></select></label>
         <div class="tmsg" id="setInfo"></div>
-        <div class="mc-btns" style="flex-direction:column;gap:10px;margin-top:8px">
-          <button class="btn-make" id="btnInviteSet" style="width:100%">📱 이 미션으로 학생 초대 (링크·QR)</button>
-          <button class="btn-sub" id="btnInviteGuess" style="width:100%">🔍 날씨 맞추기로 학생 초대</button>
-        </div>
       </div>
     </div>
 
@@ -413,6 +433,21 @@
         </div>
       </div>
     </div>
+
+    <div id="rosterPanel" hidden>
+      <div class="card tp">
+        <div class="tp-head"><h3>👥 학생 명단과 참여 여부</h3></div>
+        <p style="color:var(--sub);font-size:14px;margin:0 0 12px">쌤허브에 등록한 학생 명단이에요. 여기서 이름을 고치거나 학생을 지우면 쌤허브 명단도 똑같이 바뀌어요(모든 앱이 같은 명단을 써요). 학생 추가는 쌤허브의 학생 명단에서 해 주세요.</p>
+        <div class="roster-top">
+          <select id="rosterClass" aria-label="반 고르기"></select>
+          <span id="rosterSum" style="font-size:14px;color:var(--sub)"></span>
+          <span style="flex:1"></span>
+          <button class="btn-sub" id="rosterReload" type="button" style="font-size:14px;padding:6px 12px">새로 고침</button>
+        </div>
+        <div class="roster-wrap"><table class="roster"><thead><tr><th>학년·반</th><th>이름</th><th>날씨 미션</th><th>날씨 맞추기</th><th>마지막 참여</th><th>관리</th></tr></thead><tbody id="rosterBody"></tbody></table></div>
+        <div class="tmsg" id="rosterMsg"></div>
+      </div>
+    </div>
   </section>
 
   <div class="layout">
@@ -442,6 +477,7 @@
         <span class="student" id="studentBox"></span>
         <span class="mp-score" id="mpScore"></span>
         <button class="mp-btn" id="mpRank">🏆 순위표</button>
+        <button class="mp-btn" id="mpPick" type="button" hidden>🔄 미션 바꾸기</button>
       </div>
 
       <section class="card result" id="result" aria-live="polite"></section>
@@ -500,6 +536,7 @@
 
 
 
+  <dialog class="pick-dlg" id="pickDlg"></dialog>
   <footer>날씨 판정 기준: 구름의 양(맑음 0~5, 구름많음 6~8, 흐림 9~10), 강수량은 1시간 동안 내린 양으로 보았어요.</footer>
 </div>
 
@@ -2101,6 +2138,7 @@ const shuffle = a => { a = [...a]; for (let i=a.length-1;i>0;i--){ const j=Math.
    날씨 미션) 항상 같은 'mission-default'를 써서, 기본 미션 내용을 고쳐도 순위가 끊기지 않아요. */
 const missionSetId = name => 'mission-' + ((name || '').trim() ? strHash(name.trim()) : 'default');
 const GUESS_SET_ID = '00000000-0000-4000-8000-00000000cafe';
+const APP_CONTENT_ID = '00000000-0000-4000-8000-00000000a99a';   // '앱 전체' 초대 링크 id: 학생이 들어와서 활동을 직접 골라요
 
 /* =========================================================
    접속 주체: 학생은 입장 링크(?as=student&c=…), 선생님은 쌤허브 로그인.
@@ -2109,10 +2147,11 @@ const GUESS_SET_ID = '00000000-0000-4000-8000-00000000cafe';
 const QS = new URLSearchParams(location.search);
 const STUDENT_MODE = QS.get('as') === 'student';
 const STUDENT_CONTENT = QS.get('c');
+const APP_MODE = STUDENT_MODE && STUDENT_CONTENT === APP_CONTENT_ID;   // 앱 단위 초대로 들어온 학생
 const APP_SLUG = 'weather';
 let hub = null, hubStudent = null;
 if (STUDENT_MODE) hubStudent = await initStudent({appSlug: APP_SLUG, contentId: STUDENT_CONTENT});
-else hub = await initHub({appName: '날씨 만들기', topbar: '#bar'});
+else hub = await initHub({appName: '날씨 만들기'});   // topbar를 넘기지 않아 쌤허브 공통 메뉴는 앱 안에 나타나지 않아요
 const IS_ADMIN = !!hub && hub.profile.role === 'admin';
 
 const DB = (() => {
@@ -3072,7 +3111,7 @@ const Sets = (() => {
     $('setSel').innerHTML = opts.join('') || '<option value="">공개된 미션이 아직 없어요</option>';
     $('setSel').value = sel;
     $('sSel').innerHTML = '<option value="">(새 세트로 저장)</option>' + rows.map(r => `<option value="${r.id}">${esc(r.name)}</option>`).join('');
-    $('setInfo').textContent = rows.length || IS_ADMIN ? '' : '관리자가 미션을 공개하면 여기에 나타나요. 지금은 “날씨 맞추기”를 초대할 수 있어요.';
+    $('setInfo').textContent = rows.length || IS_ADMIN ? '' : '관리자가 미션을 공개하면 여기에 나타나요. 학생은 지금 “날씨 맞추기”와 자유 탐구를 할 수 있어요.';
   }
   const id = () => current().id, name = () => current().name;
   $('setSel').addEventListener('change', () => { sel = $('setSel').value; try { localStorage.setItem('wx-sel-set', sel); } catch(e){} });
@@ -3081,8 +3120,7 @@ const Sets = (() => {
     await hub.recordActivity({appSlug: APP_SLUG, contentId, title: title.slice(0, 100), url: '/games/weather/'});
     hub.openInvite({appSlug: APP_SLUG, contentId, title});
   }
-  $('btnInviteSet').addEventListener('click', () => { const c = current(); invite(c.id, c.name); });
-  $('btnInviteGuess').addEventListener('click', () => invite(GUESS_SET_ID, '날씨 맞추기'));
+  $('btnInviteApp').addEventListener('click', () => invite(APP_CONTENT_ID, '기상요소로 날씨 만들기'));
 
   /* 관리자: 세트 저장·불러오기·삭제 */
   const smsg = (t, cls) => { const m = $('sMsg'); m.textContent = t; m.className = 'tmsg ' + (cls || ''); };
@@ -3116,6 +3154,129 @@ const Sets = (() => {
 })();
 
 /* =========================================================
+   7-2b. 교사 모드: 학생 명단 전체와 참여 여부. 명단은 쌤허브 공통 명단(students)을 RLS로 읽고,
+         이름 고치기·삭제도 같은 명단에 그대로 반영돼요. 기록은 자기 학생 것만 읽혀요.
+   ========================================================= */
+const Roster = (() => {
+  const $ = id => document.getElementById(id);
+  let students = [], stat = new Map(), cls = 'all';
+  const msg = (t, c) => { const m = $('rosterMsg'); m.textContent = t; m.className = 'tmsg ' + (c || ''); };
+  const day = iso => { const d = new Date(iso); return `${d.getMonth()+1}/${d.getDate()}`; };
+  async function load(){
+    if (!hub) return;
+    msg('불러오는 중…');
+    const [a, b] = await Promise.all([
+      hub.sb.from('students').select('id, grade, class_no, name').order('grade').order('class_no').order('name').limit(2000),
+      hub.sb.from('weather_records').select('student_id, mode, score, max_score, created_at').order('created_at', {ascending: false}).limit(5000),
+    ]);
+    if (a.error || b.error){ msg('명단을 불러오지 못했어요. 잠시 뒤 다시 해 주세요.', 'err'); return; }
+    students = a.data; stat = new Map();
+    for (const r of b.data){
+      const st = stat.get(r.student_id) || {mission: null, guess: null, n: 0, last: r.created_at};
+      st.n++;
+      const cur = st[r.mode];
+      if (!cur || r.score / r.max_score > cur.score / cur.max_score) st[r.mode] = {score: r.score, max_score: r.max_score};
+      stat.set(r.student_id, st);
+    }
+    msg(''); render();
+  }
+  function render(){
+    const keys = [...new Set(students.map(x => `${x.grade}-${x.class_no}`))];
+    if (cls !== 'all' && !keys.includes(cls)) cls = 'all';
+    $('rosterClass').innerHTML = '<option value="all">전체 반</option>' + keys.map(k => { const [g, c] = k.split('-'); return `<option value="${k}">${g}학년 ${c}반</option>`; }).join('');
+    $('rosterClass').value = cls;
+    const rows = students.filter(x => cls === 'all' || `${x.grade}-${x.class_no}` === cls);
+    const done = rows.filter(x => stat.has(x.id)).length;
+    $('rosterSum').textContent = rows.length ? `참여 ${done}명 / 전체 ${rows.length}명 (아직 ${rows.length - done}명)` : '';
+    const cell = v => v ? `<span class="yes">✅ ${v.score}/${v.max_score}점</span>` : '–';
+    $('rosterBody').innerHTML = rows.map(x => {
+      const st = stat.get(x.id);
+      return `<tr class="${st ? '' : 'none'}"><td>${x.grade}-${x.class_no}</td><td>${esc(x.name)}</td><td>${cell(st && st.mission)}</td><td>${cell(st && st.guess)}</td>` +
+        `<td>${st ? day(st.last) + ` (${st.n}회)` : '아직 안 했어요'}</td>` +
+        `<td><button type="button" data-act="rename" data-id="${x.id}">이름 고치기</button> <button type="button" data-act="del" data-id="${x.id}">삭제</button></td></tr>`;
+    }).join('') || '<tr><td colspan="6" style="color:var(--sub)">등록된 학생이 없어요. 쌤허브의 학생 명단에서 먼저 등록해 주세요.</td></tr>';
+  }
+  $('rosterClass').addEventListener('change', () => { cls = $('rosterClass').value; render(); });
+  $('rosterReload').addEventListener('click', load);
+  $('rosterBody').addEventListener('click', async e => {
+    const b = e.target.closest('button[data-act]'); if (!b) return;
+    const x = students.find(v => v.id === b.dataset.id); if (!x) return;
+    if (b.dataset.act === 'rename'){
+      const nm = (prompt(`${x.grade}학년 ${x.class_no}반 ${x.name}\n새 이름을 써 주세요. (쌤허브 명단과 모든 앱에 함께 바뀌어요)`, x.name) || '').trim();
+      if (!nm || nm === x.name) return;
+      if (nm.length > 50) return msg('이름은 50자까지 쓸 수 있어요.', 'err');
+      const {data, error} = await hub.sb.from('students').update({name: nm}).eq('id', x.id).select('id');
+      if (error || !data || !data.length) return msg(error && error.code === '23505' ? '같은 반에 같은 이름의 학생이 이미 있어요.' : '이름을 고치지 못했어요.', 'err');
+      x.name = nm; render(); msg('이름을 고쳤어요. 쌤허브 명단에도 반영됐어요.', 'ok');
+    } else {
+      if (!confirm(`${x.grade}학년 ${x.class_no}반 ${x.name} 학생을 명단에서 지울까요?\n\n쌤허브 명단에서 완전히 지워지고, 이 학생의 기록이 날씨 게임뿐 아니라 다른 앱에서도 모두 함께 지워져요. 되돌릴 수 없어요.`)) return;
+      const {data, error} = await hub.sb.from('students').delete().eq('id', x.id).select('id');
+      if (error || !data || !data.length) return msg('지우지 못했어요.', 'err');
+      students = students.filter(v => v.id !== x.id); stat.delete(x.id); render(); msg('학생을 지웠어요.', 'ok');
+    }
+  });
+  return {load};
+})();
+
+/* =========================================================
+   7-3. 앱 단위 초대로 들어온 학생이 미션 세트를 직접 고르는 창
+   ========================================================= */
+const AppPick = (() => {
+  const $ = id => document.getElementById(id);
+  let chosen = null;
+  async function call(body){
+    const r = await studentCall('weather-record', {session_token: hubStudent.token, ...body});
+    if (r.status === 401){ hubStudent.logout({reason: 'expired'}); throw new Error('expired'); }
+    return r;
+  }
+  async function choose(id, name){
+    const dlg = $('pickDlg');
+    dlg.querySelectorAll('button').forEach(b => b.disabled = true);
+    try {
+      const r = await call({action: 'set', content_id: id});
+      if (r.status !== 200){ alert(r.data.message || '미션을 불러오지 못했어요. 다시 해 주세요.'); dlg.querySelectorAll('button').forEach(b => b.disabled = false); return; }
+      chosen = {id, name: r.data.name};
+      Mission.fromLink = true;
+      Mission.load(sanitize(r.data.missions), r.data.name, id);
+      dlg.close('chosen');
+      askPreQuiz(() => Mission.reload());
+    } catch(e){ /* 세션이 끝난 경우는 위에서 처리했어요 */ }
+  }
+  async function open(){
+    const dlg = $('pickDlg');
+    dlg.innerHTML = '<h3>🎯 어떤 미션을 할까요?</h3><p>불러오는 중…</p>';
+    dlg.returnValue = '';
+    if (!dlg.open) dlg.showModal();
+    let sets = [];
+    try {
+      const r = await call({action: 'sets', content_id: APP_CONTENT_ID});
+      sets = r.status === 200 ? r.data.sets || [] : null;
+    } catch(e){ return; }
+    const list = document.createElement('div'); list.className = 'pick-list';
+    (sets || []).forEach(x => {
+      const b = document.createElement('button'); b.type = 'button';
+      b.innerHTML = `${esc(x.name)}<small>${x.count}문제</small>`;
+      if (chosen && chosen.id === x.id) b.style.borderColor = 'var(--accent)';
+      b.addEventListener('click', () => choose(x.id, x.name));
+      list.append(b);
+    });
+    const msg = sets === null ? '미션 목록을 불러오지 못했어요. 잠시 뒤 다시 해 주세요.'
+      : sets.length ? '하고 싶은 미션을 골라요.' : '아직 공개된 미션이 없어요. 자유 탐구나 날씨 맞추기를 해 보세요.';
+    dlg.innerHTML = `<h3>🎯 어떤 미션을 할까요?</h3><p>${msg}</p>`;
+    dlg.append(list);
+    const close = document.createElement('button'); close.type = 'button'; close.className = 'btn-sub'; close.style.width = '100%';
+    close.textContent = chosen ? '닫기' : '자유 탐구로 돌아가기';
+    close.addEventListener('click', () => dlg.close('cancel'));
+    dlg.append(close);
+  }
+  $('pickDlg').addEventListener('close', () => {
+    if ($('pickDlg').returnValue !== 'chosen' && !chosen && mode === 'mission') setMode('free');
+  });
+  $('mpPick').addEventListener('click', open);
+  return {open, get chosen(){ return chosen; }};
+})();
+
+/* =========================================================
    8. 화면 모드 전환
    ========================================================= */
 function setMode(m){
@@ -3133,6 +3294,8 @@ function setMode(m){
   }
   if (m !== 'teacher' && m !== 'guess') resetBoard();
   if (m === 'guess') Guess.enter();
+  if (m === 'guess' && APP_MODE) askPreQuiz(null);   // 앱 단위 초대: 날씨 맞추기를 시작할 때 기본 개념 문제(처음 한 번)
+  if (m === 'mission' && APP_MODE && !AppPick.chosen) AppPick.open();   // 앱 단위 초대: 미션 세트를 먼저 골라요
   if (m === 'teacher') Admin.renderWho();
   Mission.renderMissionUI(); renderHistory();
 }
@@ -3142,14 +3305,10 @@ document.querySelector('.tabs').addEventListener('click', async ev => {
   setMode(t.dataset.mode);
 });
 
-/* 화면 위쪽 '학생 초대 QR' 버튼: 교사 모드로 들어가지 않고 지금 보는 활동으로 바로 초대 링크·QR을 만들어요.
-   날씨 맞추기 화면이면 날씨 맞추기, 그 밖의 화면이면 고른 미션 세트로 만들어요. */
-document.getElementById('btnQuickInvite').addEventListener('click', async () => {
-  if (!hub) return;
-  if (mode === 'guess') return Sets.invite(GUESS_SET_ID, '날씨 맞추기');
-  const c = Sets.current();
-  if (Sets.isUuid(c.id)) return Sets.invite(c.id, c.name);
-  if (confirm('저장된(공개된) 미션 세트가 없어요.\n날씨 맞추기로 학생을 초대할까요?')) return Sets.invite(GUESS_SET_ID, '날씨 맞추기');
+/* 화면 위쪽 '학생 초대 QR' 버튼: 교사 모드로 들어가지 않고 앱 전체 초대 링크·QR을 바로 만들어요.
+   학생은 들어와서 자유 탐구·날씨 미션(세트 고르기)·날씨 맞추기를 직접 골라요. */
+document.getElementById('btnQuickInvite').addEventListener('click', () => {
+  if (hub) Sets.invite(APP_CONTENT_ID, '기상요소로 날씨 만들기');
 });
 
 /* 관리자 모드 안의 두 서브메뉴(미션 출제 / 점수 관리) 전환 */
@@ -3159,6 +3318,8 @@ document.getElementById('adminSubtabs').addEventListener('click', e => {
   document.getElementById('invitePanel').hidden = b.dataset.sub !== 'invite';
   document.getElementById('authorPanel').hidden = b.dataset.sub !== 'author';
   document.getElementById('scorePanel').hidden = b.dataset.sub !== 'score';
+  document.getElementById('rosterPanel').hidden = b.dataset.sub !== 'roster';
+  if (b.dataset.sub === 'roster') Roster.load();
 });
 document.getElementById('scoreMissionRank').addEventListener('click', () => Rank.open(Sets.id(), Sets.name(), null, true));
 document.getElementById('scoreGuessRank').addEventListener('click', () => Rank.open(GUESS_SET_ID, '날씨 맞추기', null, true));
@@ -3205,6 +3366,11 @@ async function boot(){
     const r = await studentCall('weather-record', {action: 'set', session_token: hubStudent.token, content_id: STUDENT_CONTENT});
     if (r.status === 401){ hubStudent.logout({reason: 'expired'}); return; }
     if (r.status !== 200){ document.body.innerHTML = `<main style="font:18px/1.6 system-ui,sans-serif;max-width:460px;margin:15vh auto;padding:0 20px"><p>${esc(r.data.message || '지금은 들어갈 수 없어요. 선생님께 확인해 주세요.')}</p></main>`; return; }
+    if (r.data.mode === 'app'){   // 앱 단위 초대: 세 가지 활동을 모두 열어 두고, 학생이 직접 고르게 해요
+      document.getElementById('mpPick').hidden = false;
+      Mission.fromLink = true; Mission.load([], '', null);
+      setMode('free'); return;
+    }
     if (r.data.mode === 'guess'){
       document.querySelector('.tab[data-mode="mission"]').hidden = true;
       Mission.fromLink = true; Mission.load([], '', GUESS_SET_ID);
