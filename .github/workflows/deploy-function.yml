@@ -41,5 +41,5 @@ jobs:
         if: steps.chk.outputs.skip != '1'
         run: |
           for fn in $(ls supabase/functions | grep -v '^_shared$'); do
-            supabase functions deploy "$fn" --project-ref "$PROJECT_REF" --no-verify-jwt
+            supabase functions deploy "$fn" --project-ref "$PROJECT_REF" --no-verify-jwt --yes
           done
