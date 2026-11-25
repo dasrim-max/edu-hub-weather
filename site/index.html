@@ -30,6 +30,11 @@
   .qr-btn{display:inline-flex;align-items:center;gap:6px;font-size:15px;padding:7px 12px;border-radius:12px;white-space:nowrap;background:var(--accent);color:var(--accent-ink);box-shadow:0 3px 0 #1f5fa8}
   .qr-btn[hidden]{display:none}
   @media (max-width:760px){header{justify-content:center;text-align:center} .h1-row{justify-content:center}}
+  /* 쌤허브가 띄운 앱 창: 왼쪽 위 앱 이름표 자리(--ss-appbadge-w × --ss-appbadge-h)를 비우고, 앱 제목은 이름표가 대신해요 */
+  html[data-ss-appbadge] header{padding-left:var(--ss-appbadge-w,16px);min-height:var(--ss-appbadge-h,52px)}
+  html[data-ss-appbadge] header .h1-row{display:none}
+  /* 휴대폰: 옆을 비우면 탭이 찌그러지므로 이름표 아래로 내려요 */
+  @media (max-width:760px){html[data-ss-appbadge] header{padding-left:0;padding-top:var(--ss-appbadge-h,52px);min-height:0}}
 
   /* 왼쪽: 위에 날씨 그림, 그 아래 기상 요소 조절 카드들 / 오른쪽: 결과·안내 내용 (왼쪽 전체 높이에 맞춤, JS로 높이 동기화) */
   .layout{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;align-items:start}
@@ -74,8 +79,9 @@
   .minmax{display:flex;justify-content:space-between;font-size:8.5px;color:var(--sub);margin-top:1px;line-height:1.3}
 
   .btns{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:8px;margin-top:14px}
-  button{font-family:"Jua";font-size:18px;border:none;border-radius:14px;padding:13px 8px;cursor:pointer;transition:transform .08s,box-shadow .2s,background .2s}
-  button:active{transform:translateY(1px) scale(.98)}
+  /* 앱 버튼 기본 모양. 쌤허브 공통 팝업·이름표 버튼(ss-, hub-)은 건드리지 않아요(:where로 우선순위는 그대로) */
+  button:where(:not([class^="ss-"],[class^="hub-"])){font-family:"Jua";font-size:18px;border:none;border-radius:14px;padding:13px 8px;cursor:pointer;transition:transform .08s,box-shadow .2s,background .2s}
+  button:where(:not([class^="ss-"],[class^="hub-"])):active{transform:translateY(1px) scale(.98)}
   .btn-make{background:var(--accent);color:var(--accent-ink);box-shadow:0 4px 0 #1f5fa8}
   .btn-make.dirty{animation:pulse 1.4s infinite}
   @keyframes pulse{0%,100%{box-shadow:0 4px 0 #1f5fa8,0 0 0 0 rgba(47,127,216,.45)}50%{box-shadow:0 4px 0 #1f5fa8,0 0 0 10px rgba(47,127,216,0)}}
@@ -2150,7 +2156,7 @@ const APP_MODE = STUDENT_MODE && STUDENT_CONTENT === APP_CONTENT_ID;   // 앱 �
 const APP_SLUG = 'weather';
 let hub = null, hubStudent = null;
 if (STUDENT_MODE) hubStudent = await initStudent({appSlug: APP_SLUG, contentId: STUDENT_CONTENT});
-else hub = await initHub({appName: '날씨 만들기'});   // topbar를 넘기지 않아 쌤허브 공통 메뉴는 앱 안에 나타나지 않아요
+else hub = await initHub({appName: '기상요소로 날씨 만들기', appVersion: '1.0'});   // 쌤허브가 띄운 창이면 왼쪽 위에 앱 이름표(이름 + 버전)가 떠요. topbar는 넘기지 않아요
 const IS_ADMIN = !!hub && hub.profile.role === 'admin';
 
 const DB = (() => {
@@ -3306,9 +3312,8 @@ document.querySelector('.tabs').addEventListener('click', async ev => {
 
 /* 화면 위쪽 '학생 초대 QR' 버튼: 교사 모드로 들어가지 않고 앱 전체 초대 링크·QR을 바로 만들어요.
    학생은 들어와서 자유 탐구·날씨 미션(세트 고르기)·날씨 맞추기를 직접 골라요. */
-document.getElementById('btnQuickInvite').addEventListener('click', () => {
-  if (hub) Sets.invite(APP_CONTENT_ID, '기상요소로 날씨 만들기');
-});
+const quickInvite = () => { if (hub) Sets.invite(APP_CONTENT_ID, '기상요소로 날씨 만들기'); };
+document.getElementById('btnQuickInvite').addEventListener('click', quickInvite);
 
 /* 관리자 모드 안의 두 서브메뉴(미션 출제 / 점수 관리) 전환 */
 document.getElementById('adminSubtabs').addEventListener('click', e => {
@@ -3382,7 +3387,9 @@ async function boot(){
     setMode('mission'); askPreQuiz(() => Mission.reload()); return;
   }
   if (!IS_ADMIN) document.getElementById('subAuthor').remove();
-  document.getElementById('btnQuickInvite').hidden = false;
+  // 앱 이름표가 떠 있으면 'QR 생성'을 이름표 오른쪽 버튼으로, 아니면 제목 옆 버튼으로 보여 줘요
+  if (hub.badge) hub.badge.addAction('QR 생성', quickInvite);
+  else document.getElementById('btnQuickInvite').hidden = false;
   await Sets.refresh();
   const c = Sets.current(); Mission.load(c.missions, c.name, c.id);
   resetBoard();
