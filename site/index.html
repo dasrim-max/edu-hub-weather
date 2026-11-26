@@ -6,6 +6,17 @@
 <title>기상 요소로 날씨 만들기</title>
 <!-- 쌤허브 기본 애플 스타일: theme.js(화면 색상) → tokens → components → 앱 CSS → fonts.css(쿠키런) → skin-apple.css -->
 <script src="/shared/ui/js/theme.js"></script>
+<script>
+  /* 쌤허브가 띄운 창(launch=hub, 틀 밖)이면 처음부터 앱 제목을 숨겨요. 앱 이름표는 앱 코드를 다 불러온 뒤에 뜨므로,
+     그 사이 예전 제목("기상 요소로 날씨 만들기")이 잠깐 보였다가 바뀌지 않게 해요. 판단 기준은 /shared/embed.js 의 isLaunchedFromHub 와 같아요 */
+  (function () {
+    try {
+      var hub = new URLSearchParams(location.search).get("launch") === "hub" || sessionStorage.getItem("hub:launch") === "1";
+      var stu = new URLSearchParams(location.search).get("as") === "student";
+      if (hub && !stu && window.self === window.top) document.documentElement.classList.add("wx-hub");
+    } catch (e) {}
+  })();
+</script>
 <link rel="stylesheet" href="/shared/ui/css/tokens.css">
 <link rel="stylesheet" href="/shared/ui/css/components.css">
 <link rel="preload" href="/shared/ui/fonts/CookieRun-Bold.woff2" as="font" type="font/woff2" crossorigin>
@@ -37,10 +48,10 @@
   /* 쌤허브가 띄운 앱 창: 왼쪽 위 앱 이름표 자리(--ss-appbadge-w × --ss-appbadge-h)를 비우고, 앱 제목은 이름표가 대신해요 */
   /* 메뉴와 이름표는 늘 같은 높이: 이름표는 위에서 10px, 높이 = 글자 1.8배(가운데 = 10px + 0.9배).
      메뉴 높이는 글자 1.8배 + 8px 이라, 위 여백 6px 이면 두 가운데 선이 겹쳐요 */
-  html[data-ss-appbadge] header{padding-left:var(--ss-appbadge-w,16px);padding-top:6px;min-height:var(--ss-appbadge-h,52px);align-items:flex-start}
-  html[data-ss-appbadge] header .h1-row{display:none}
+  html:is([data-ss-appbadge],.wx-hub) header{padding-left:var(--ss-appbadge-w,16px);padding-top:6px;min-height:var(--ss-appbadge-h,52px);align-items:flex-start}
+  html:is([data-ss-appbadge],.wx-hub) header .h1-row{display:none}
   /* 휴대폰: 옆을 비우면 탭이 찌그러지므로 이름표 아래로 내려요 */
-  @media (max-width:760px){html[data-ss-appbadge] header{padding-left:0;padding-top:var(--ss-appbadge-h,52px);min-height:0}}
+  @media (max-width:760px){html:is([data-ss-appbadge],.wx-hub) header{padding-left:0;padding-top:var(--ss-appbadge-h,52px);min-height:0}}
 
   /* 왼쪽: 위에 날씨 그림, 그 아래 기상 요소 조절 카드들 / 오른쪽: 결과·안내 내용 (왼쪽 전체 높이에 맞춤, JS로 높이 동기화) */
   .layout{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;align-items:start}
