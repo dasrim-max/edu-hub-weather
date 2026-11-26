@@ -35,7 +35,9 @@
   .qr-btn[hidden]{display:none}
   @media (max-width:760px){header{justify-content:center;text-align:center} .h1-row{justify-content:center}}
   /* 쌤허브가 띄운 앱 창: 왼쪽 위 앱 이름표 자리(--ss-appbadge-w × --ss-appbadge-h)를 비우고, 앱 제목은 이름표가 대신해요 */
-  html[data-ss-appbadge] header{padding-left:var(--ss-appbadge-w,16px);min-height:var(--ss-appbadge-h,52px)}
+  /* 메뉴와 이름표는 늘 같은 높이: 이름표는 위에서 10px, 높이 = 글자 1.8배(가운데 = 10px + 0.9배).
+     메뉴 높이는 글자 1.8배 + 8px 이라, 위 여백 6px 이면 두 가운데 선이 겹쳐요 */
+  html[data-ss-appbadge] header{padding-left:var(--ss-appbadge-w,16px);padding-top:6px;min-height:var(--ss-appbadge-h,52px);align-items:flex-start}
   html[data-ss-appbadge] header .h1-row{display:none}
   /* 휴대폰: 옆을 비우면 탭이 찌그러지므로 이름표 아래로 내려요 */
   @media (max-width:760px){html[data-ss-appbadge] header{padding-left:0;padding-top:var(--ss-appbadge-h,52px);min-height:0}}
@@ -158,8 +160,8 @@
   .tabs{display:flex;gap:8px;justify-content:flex-end;margin:0 0 0 auto;flex-wrap:wrap}
   @media (max-width:760px){.tabs{margin:0 auto;justify-content:center}}
   /* 앱 위쪽 메뉴: 글자 크기는 왼쪽 위 앱 이름표와 같게(--ss-appbadge-size, 기본 18px, 좁은 화면 16px까지) */
-  .tab{background:var(--ap-fill);color:var(--ink);border:0;box-shadow:none;padding:9px 16px;font-size:var(--ss-appbadge-size,18px);line-height:1.2}
-  @media (max-width:720px){.tab{font-size:min(var(--ss-appbadge-size,18px),16px);padding:8px 13px}}
+  .tab{display:inline-flex;align-items:center;justify-content:center;gap:.3em;height:calc(1.8em + 8px);background:var(--ap-fill);color:var(--ink);border:0;box-shadow:none;padding:0 16px;font-size:var(--ss-appbadge-size,18px);line-height:1}
+  @media (max-width:720px){.tab{font-size:min(var(--ss-appbadge-size,18px),16px);padding:0 13px}}
   .tab.on{background:var(--ink);color:var(--card);box-shadow:none}
   .roster-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px}
   .roster-top select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
