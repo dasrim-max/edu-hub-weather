@@ -6,17 +6,6 @@
 <title>기상 요소로 날씨 만들기</title>
 <!-- 쌤허브 기본 애플 스타일: theme.js(화면 색상) → tokens → components → 앱 CSS → fonts.css(쿠키런) → skin-apple.css -->
 <script src="/shared/ui/js/theme.js"></script>
-<script>
-  /* 쌤허브가 띄운 창(launch=hub, 틀 밖)이면 처음부터 이름표 자리를 비워요. 앱 이름표는 앱 코드를 다 불러온 뒤에 뜨므로,
-     그 사이 메뉴가 덜컥 움직이지 않게 해요(포털 theme.js 도 같은 일을 하게 되면 지워도 돼요). 판단 기준은 /shared/embed.js 의 isLaunchedFromHub 와 같아요 */
-  (function () {
-    try {
-      var hub = new URLSearchParams(location.search).get("launch") === "hub" || sessionStorage.getItem("hub:launch") === "1";
-      var stu = new URLSearchParams(location.search).get("as") === "student";
-      if (hub && !stu && window.self === window.top) document.documentElement.classList.add("wx-hub");
-    } catch (e) {}
-  })();
-</script>
 <link rel="stylesheet" href="/shared/ui/css/tokens.css">
 <link rel="stylesheet" href="/shared/ui/css/components.css">
 <link rel="preload" href="/shared/ui/fonts/CookieRun-Bold.woff2" as="font" type="font/woff2" crossorigin>
@@ -46,10 +35,10 @@
   /* 쌤허브가 띄운 앱 창: 왼쪽 위 앱 이름표 자리(--ss-appbadge-w × --ss-appbadge-h)를 비워요 */
   /* 메뉴와 이름표는 늘 같은 높이: 이름표는 위에서 10px, 높이 = 글자 1.8배(가운데 = 10px + 0.9배).
      메뉴 높이는 글자 1.8배 + 8px 이라, 위 여백 6px 이면 두 가운데 선이 겹쳐요 */
-  html:is([data-ss-appbadge],.wx-hub) header{padding-left:var(--ss-appbadge-w,16px);padding-top:6px;min-height:var(--ss-appbadge-h,52px);align-items:flex-start}
-  html:is([data-ss-appbadge],.wx-hub) header .h1-row{display:none}
+  html[data-ss-appbadge] header{padding-left:var(--ss-appbadge-w,16px);padding-top:6px;min-height:var(--ss-appbadge-h,52px);align-items:flex-start}
+  html[data-ss-appbadge] header .h1-row{display:none}
   /* 휴대폰: 옆을 비우면 탭이 찌그러지므로 이름표 아래로 내려요 */
-  @media (max-width:760px){html:is([data-ss-appbadge],.wx-hub) header{padding-left:0;padding-top:var(--ss-appbadge-h,52px);min-height:0}}
+  @media (max-width:760px){html[data-ss-appbadge] header{padding-left:0;padding-top:var(--ss-appbadge-h,52px);min-height:0}}
 
   /* 왼쪽: 위에 날씨 그림, 그 아래 기상 요소 조절 카드들 / 오른쪽: 결과·안내 내용 (왼쪽 전체 높이에 맞춤, JS로 높이 동기화) */
   .layout{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;align-items:start}
@@ -181,14 +170,6 @@
   .roster tr.none td{color:var(--sub)}
   .roster .yes{color:var(--ap-green);font-weight:700}
   .roster button{font-family:var(--ss-font-body);font-size:13px;padding:4px 9px;background:var(--ap-fill);color:var(--ink);box-shadow:none;border-radius:8px}
-  .pick-dlg{border:none;border-radius:18px;padding:20px 20px 16px;width:min(460px,92vw);box-shadow:var(--ap-shadow-lg)}
-  .pick-dlg::backdrop{background:var(--ss-scrim)}
-  .pick-dlg h3{margin:0 0 6px;font-size:22px}
-  .pick-dlg p{margin:0 0 12px;color:var(--sub);font-size:14px}
-  .pick-list{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow:auto;margin:0 0 12px;padding:2px}
-  .pick-list button{text-align:left;background:var(--ap-fill);border:2px solid var(--line);box-shadow:none;font-family:var(--ss-font-body);font-size:16px;padding:12px 14px;color:var(--ink)}
-  .pick-list button small{color:var(--sub);margin-left:6px}
-  .pick-list button:hover{border-color:var(--accent)}
 
   /* ---------- 날씨 미션 상단 바: 자유 탐구와 같은 레이아웃이 되도록 .side 맨 위, 그림 윗줄에 맞춰 배치 ---------- */
   .mission-topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:12px 14px}
@@ -252,12 +233,8 @@
   .mp-btn{font-size:15px;padding:7px 12px;background:var(--ap-orange-tint);color:var(--ap-orange);box-shadow:none}
   .pts{font-family:var(--ss-font-display);font-weight:700;font-size:15px;color:var(--ap-orange)}
   .pts-big{font-family:var(--ss-font-display);font-weight:700;font-size:34px;color:var(--ap-orange)}
-  .modal{position:fixed;inset:0;background:var(--ss-scrim);display:grid;place-items:center;z-index:50;padding:16px}
-  .modal-card{background:var(--card);border-radius:var(--ap-r-xl);padding:22px;width:min(560px,100%);max-height:90vh;overflow:auto;box-shadow:var(--ap-shadow-lg)}
-  .modal-card h3{margin:0 0 6px;font-size:24px}
-  .modal-card > p{color:var(--sub);margin:0 0 16px;line-height:1.55}
   .login-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-  .login-row select,.modal-card input{width:100%;font:inherit;font-size:17px;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:var(--ap-card-2);color:var(--ink)}
+  .login-row select{width:100%;font:inherit;font-size:17px;border:1px solid var(--line);border-radius:12px;padding:11px 12px;background:var(--ap-card-2);color:var(--ink)}
   .school-input{display:flex;align-items:stretch;border:1px solid var(--line);border-radius:12px;background:var(--ap-card-2);margin-bottom:8px;overflow:hidden}
   .school-input input{flex:1;min-width:0;width:auto;border:none;border-radius:0;background:transparent;padding:11px 0 11px 12px}
   .school-input input:focus{outline:none}
@@ -275,7 +252,6 @@
   .rk-name{font-family:var(--ss-font-display);font-weight:700;font-size:17px}
   .rk-sub{font-size:12.5px;color:var(--sub)}
   .rk-score{font-family:var(--ss-font-display);font-weight:700;font-size:20px;color:var(--ap-orange);text-align:right}
-  .rk-item.admin{grid-template-columns:44px 1fr auto auto}
   .rk-act{display:flex;gap:4px}
   .rk-act button{font-size:13px;padding:6px 9px;border-radius:9px;border:none;cursor:pointer;background:var(--ap-fill);color:var(--ink);box-shadow:none;font-family:inherit}
   .rk-act button:hover{background:var(--ap-fill-2)}
@@ -288,6 +264,15 @@
   .rk-pager span{font-size:13.5px;color:var(--sub);white-space:nowrap}
   .myrank{background:var(--ap-orange-tint);border-radius:14px;padding:12px 14px;margin-bottom:12px;font-size:16px;line-height:1.6}
   .myrank b{font-family:var(--ss-font-display);font-weight:700;font-size:20px}
+  /* 공통 팝업(dialog.js) 안의 앱 내용 */
+  .wx-dlg{display:flex;flex-direction:column;gap:10px}
+  .wx-dlg .qq{margin:0}
+  .wx-pq-progress{font-size:14px;color:var(--sub)}
+  .wx-pq-img{width:100%;max-width:300px;border-radius:12px;display:block;margin:0 0 10px}
+  .rk-search input{border:1px solid var(--line);border-radius:12px;background:var(--ap-card-2);color:var(--ink);font:inherit}
+  .rk-score small{font-size:13px;color:var(--sub)}
+  .wx-blocked{max-width:460px;margin:15vh auto;padding:0 20px;font-size:20px}
+  .roster-link{display:inline-flex;align-items:center;font-size:14px;color:var(--ap-accent-text)}
   .burst{position:fixed;top:-40px;font-size:26px;pointer-events:none;z-index:99;animation:fall linear forwards}
   @keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
 
@@ -464,14 +449,14 @@
     <div id="rosterPanel" hidden>
       <div class="card tp">
         <div class="tp-head"><h3>👥 학생 명단과 참여 여부</h3></div>
-        <p style="color:var(--sub);font-size:14px;margin:0 0 12px">쌤허브에 등록한 학생 명단이에요. 여기서 이름을 고치거나 학생을 지우면 쌤허브 명단도 똑같이 바뀌어요(모든 앱이 같은 명단을 써요). 학생 추가는 쌤허브의 학생 명단에서 해 주세요.</p>
+        <p style="color:var(--sub);font-size:14px;margin:0 0 12px">쌤허브에 등록한 학생 명단과 날씨 게임 참여 여부예요. 학생 추가·이름 고치기·지우기는 쌤허브 <a class="roster-link" href="/students.html" target="_blank" rel="noopener">학생 명단 ↗</a>에서 해 주세요(모든 앱이 같은 명단을 써요).</p>
         <div class="roster-top">
           <select id="rosterClass" aria-label="반 고르기"></select>
           <span id="rosterSum" style="font-size:14px;color:var(--sub)"></span>
           <span style="flex:1"></span>
           <button class="btn-sub" id="rosterReload" type="button" style="font-size:14px;padding:6px 12px">새로 고침</button>
         </div>
-        <div class="roster-wrap"><table class="roster"><thead><tr><th>학년·반</th><th>이름</th><th>날씨 미션</th><th>날씨 맞추기</th><th>마지막 참여</th><th>관리</th></tr></thead><tbody id="rosterBody"></tbody></table></div>
+        <div class="roster-wrap"><table class="roster"><thead><tr><th>학년·반</th><th>이름</th><th>날씨 미션</th><th>날씨 맞추기</th><th>마지막 참여</th></tr></thead><tbody id="rosterBody"></tbody></table></div>
         <div class="tmsg" id="rosterMsg"></div>
       </div>
     </div>
@@ -516,59 +501,18 @@
     </div>
   </div>
 
-  <div class="modal" id="preQuizModal" hidden>
-    <div class="modal-card">
-      <h3>🌦️ 기상 요소, 얼마나 알고 있나요?</h3>
-      <p id="pqIntro"></p>
-      <div class="jua" id="pqProgress" style="font-size:14px;color:var(--sub);margin-bottom:6px"></div>
-      <div class="qq" id="pqQ"></div>
-      <div class="qch" id="pqChoices"></div>
-      <div class="qmsg" id="pqMsg"></div>
-    </div>
-  </div>
-
-  <div class="modal" id="rankModal" hidden>
-    <div class="modal-card">
-      <h3>🏆 순위표</h3>
-      <p id="rkTitle"></p>
-      <div id="rkMine"></div>
-      <div class="rk-search">
-        <input id="rkNameQ" maxlength="10" placeholder="🔍 내 이름으로 검색 (예: 홍길동)" autocomplete="off">
-        <button class="btn-make" id="rkNameSearch">검색</button>
-      </div>
-      <div class="rk-search" style="display:none">
-        <input id="rkSchoolQ" maxlength="16" placeholder="🔍 학교명으로 검색" autocomplete="off">
-        <button class="btn-sub" id="rkSchoolClear">학교별</button>
-      </div>
-      <button class="btn-sub" id="rkToday" type="button" hidden style="width:100%;margin-bottom:10px">📅 오늘 전체 기록 보기</button>
-      <div class="rk-filter" id="rkFilter">
-        <button data-f="class" class="on">우리 반</button><button data-f="grade">우리 학년</button><button data-f="school">선생님 반 전체</button>
-      </div>
-      <ol class="rk-list" id="rkList"></ol>
-      <div class="rk-pager" id="rkPager" hidden></div>
-      <div class="rk-note" id="rkNote"></div>
-      <div class="mc-btns"><button class="btn-sub" id="rkClose" style="flex:1">닫기</button></div>
-    </div>
-  </div>
-
-  <div class="modal" id="editRecModal" hidden>
-    <div class="modal-card">
-      <h3>✎ 기록 수정</h3>
-      <input id="erName" maxlength="20" placeholder="이름" autocomplete="off" style="margin-bottom:8px">
-      <input id="erSchool" maxlength="30" placeholder="학교 이름" autocomplete="off">
-      <div class="tmsg err" id="erMsg"></div>
-      <div class="mc-btns" style="margin-top:10px"><button class="btn-make" id="erSave" style="flex:1">저장</button><button class="btn-sub" id="erCancel">취소</button></div>
-    </div>
-  </div>
-
-
-
-  <dialog class="pick-dlg" id="pickDlg"></dialog>
   <footer>날씨 판정 기준: 구름의 양(맑음 0~5, 구름많음 6~8, 흐림 9~10), 강수량은 1시간 동안 내린 양으로 보았어요.</footer>
 </div>
 
 <script type="module">
-import { initHub, initStudent, studentCall } from "/shared/index.js";
+import { initApp } from "/shared/app.js";
+import { APP_ENTRY_ID } from "/shared/config.js";
+import { ask, openModal, errorBox, loadingBox } from "/shared/dialog.js";
+import { pickContent } from "/shared/pick.js";
+import { local } from "/shared/local.js";
+import { h } from "/shared/ui.js";
+const APP_SLUG = 'weather';
+const APP_VERSION = '1.1';
 /* =========================================================
    1. 기상 요소 정의
    ========================================================= */
@@ -1925,20 +1869,6 @@ const guessScene = createScene(document.getElementById('guessScene'));
    ========================================================= */
 let mode = 'free';
 const esc = x => String(x).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-/* 전체 학교 순위표에서 다른 학교 이름을 가릴 때, 이름 글자 수만큼 🏫 아이콘으로
-   바꿔서 보여줘요(예: 보평초등학교 → 🏫🏫초등학교). 숫자·영문처럼 한글이 아닌
-   글자는 그대로 둬요. */
-function maskSchool(school){
-  if (!school) return school;
-  const m = school.match(/^(.*?)(초등학교|중학교|고등학교|유치원)$/);
-  const prefix = m ? m[1] : school;
-  const suffix = m ? m[2] : '';
-  const icons = [...String(prefix)].map(ch => {
-    const code = ch.charCodeAt(0) - 0xAC00;
-    return (code >= 0 && code <= 11171) ? '🏫' : ch;
-  }).join('');
-  return icons + suffix;
-}
 const EL = Object.fromEntries(ELEMENTS.map(e => [e.key, e]));
 const JOSA = {temp:'을', wind:'을', hum:'를', cloud:'을', rain:'을'};
 const ida = w => { const c = w.charCodeAt(w.length-1); return (c>=0xAC00 && c<=0xD7A3 && (c-0xAC00)%28) ? '이에요' : '예요'; };
@@ -2152,12 +2082,17 @@ function sanitize(list){
   });
 }
 
-/* 저장소 (브라우저에만 저장, 서버 저장 없음) */
-const store = {
-  get(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch(e){ return d; } },
-  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} },
-  remove(k){ try { localStorage.removeItem(k); } catch(e){} }
-};
+/* 이 기기에 잠깐 저장(쌤허브 공통 local). 예전 저장 값(wx-…)은 처음 한 번 옮겨 와요 */
+const store = local(APP_SLUG);
+try {
+  for (let i = localStorage.length - 1; i >= 0; i--){
+    const k = localStorage.key(i);
+    if (!k || !k.startsWith('wx-')) continue;
+    const v = localStorage.getItem(k);
+    try { store.set(k, k === 'wx-sel-set' ? v : JSON.parse(v)); } catch(e){}
+    localStorage.removeItem(k);
+  }
+} catch(e){}
 const strHash = s => { let h = 0; for (const ch of s) h = (h*31 + ch.charCodeAt(0)) | 0; return (h>>>0).toString(36); };
 const shuffle = a => { a = [...a]; for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
 /* 미션 '세트'를 구분하는 ID는 미션 이름(setName)만으로 정해요. 문제 내용(문구·순서·개수 등)을
@@ -2165,30 +2100,24 @@ const shuffle = a => { a = [...a]; for (let i=a.length-1;i>0;i--){ const j=Math.
    날씨 미션) 항상 같은 'mission-default'를 써서, 기본 미션 내용을 고쳐도 순위가 끊기지 않아요. */
 const missionSetId = name => 'mission-' + ((name || '').trim() ? strHash(name.trim()) : 'default');
 const GUESS_SET_ID = '00000000-0000-4000-8000-00000000cafe';
-const APP_CONTENT_ID = '00000000-0000-4000-8000-00000000a99a';   // '앱 전체' 초대 링크 id: 학생이 들어와서 활동을 직접 골라요
 
 /* =========================================================
    접속 주체: 학생은 입장 링크(?as=student&c=…), 선생님은 쌤허브 로그인.
    기록은 서버 함수(weather-record)로만 저장하고, 선생님은 자기 학생 기록만 읽고 지워요.
    ========================================================= */
-const QS = new URLSearchParams(location.search);
-const STUDENT_MODE = QS.get('as') === 'student';
-const STUDENT_CONTENT = QS.get('c');
-const APP_MODE = STUDENT_MODE && STUDENT_CONTENT === APP_CONTENT_ID;   // 앱 단위 초대로 들어온 학생
-const APP_SLUG = 'weather';
-let hub = null, hubStudent = null;
-if (STUDENT_MODE) hubStudent = await initStudent({appSlug: APP_SLUG, contentId: STUDENT_CONTENT});
-else hub = await initHub({appName: '기상요소로 날씨 만들기', appVersion: '1.0'});   // 쌤허브가 띄운 창이면 왼쪽 위에 앱 이름표(이름 + 버전)가 떠요. topbar는 넘기지 않아요
+// 앱 입구(쌤허브 공통 initApp): 학생(?as=student) · 쌤허브 교사 창 · 그 밖은 로그인 화면으로
+const app = await initApp({appSlug: APP_SLUG, appName: '기상요소로 날씨 만들기', appVersion: APP_VERSION, appHome: './'});
+const hub = app.hub, hubStudent = app.me;
+const STUDENT_MODE = app.role === 'student';
+const STUDENT_CONTENT = app.contentId;   // 학생: 입장한 활동(미션 세트·날씨 맞추기) 또는 APP_ENTRY_ID(앱 전체·수업 흐름)
+const APP_MODE = STUDENT_MODE && app.isEntry;   // 앱 전체·수업 흐름으로 들어온 학생: 활동을 직접 골라요
 const IS_ADMIN = !!hub && hub.profile.role === 'admin';
 
 const DB = (() => {
   const online = true;
   const isUuid = v => typeof v === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
-  async function postOnline(rec){
-    const r = await studentCall('weather-record', {action: 'submit', session_token: hubStudent.token, ...rec});
-    if (r.status === 401){ hubStudent.logout({reason: 'expired'}); throw new Error('expired'); }
-    if (r.status !== 200 || !r.data.ok) throw new Error('저장 실패 ' + r.status);
-  }
+  // 학생 서버 함수는 me.call: 세션·입장 시간이 끝나면(401) 공통 모듈이 입장 화면으로 보내요
+  async function postOnline(rec){ await hubStudent.call('weather-record', {action: 'submit', ...rec}); }
   async function add(rec){
     if (!hubStudent) return false;   // 선생님 미리보기는 저장하지 않아요
     try { await postOnline(rec); return true; }
@@ -2204,10 +2133,8 @@ const DB = (() => {
   // f: 'class'(우리 반) | 'grade'(우리 학년) | 'school'·'any'(선생님 반 전체)
   async function list(setId, f){
     if (hubStudent){
-      const r = await studentCall('weather-record', {action: 'rank', session_token: hubStudent.token, content_id: setId, scope: f === 'class' ? 'class' : f === 'grade' ? 'grade' : 'all'});
-      if (r.status === 401){ hubStudent.logout({reason: 'expired'}); throw new Error('expired'); }
-      if (r.status !== 200) throw new Error('불러오기 실패 ' + r.status);
-      return r.data.rows;
+      const d = await hubStudent.call('weather-record', {action: 'rank', content_id: setId, scope: f === 'class' ? 'class' : f === 'grade' ? 'grade' : 'all'});
+      return d.rows;
     }
     if (!isUuid(setId)) return [];
     const {data, error} = await hub.sb.from('weather_records')
@@ -2218,8 +2145,6 @@ const DB = (() => {
     return data.filter(r => r.student && !seen.has(r.student_id) && seen.add(r.student_id))
       .map(r => ({rid: r.id, name: r.student.name, grade: r.student.grade, class_no: r.student.class_no, score: r.score, max_score: r.max_score, duration_sec: r.duration_sec, created_at: r.created_at}));
   }
-  async function listToday(){ return []; }
-  async function update(){ throw new Error('수정할 수 없어요.'); }
   async function remove(rid){   // 선생님: 자기 학생의 기록 하나 지우기 (RLS가 남의 기록은 막아요)
     if (!hub) throw new Error('선생님만 지울 수 있어요.');
     const {data, error} = await hub.sb.from('weather_records').delete().eq('id', rid).select('id');
@@ -2227,16 +2152,18 @@ const DB = (() => {
     return true;
   }
   flush();
-  return {online, add, list, listToday, update, remove};
+  return {add, list, remove};
 })();
 
 const Student = (() => {
   const $ = id => document.getElementById(id);
   const me = hubStudent ? {school: '', grade: hubStudent.grade, cls: hubStudent.class_no, name: hubStudent.name} : null;
-  function render(){
-    const html = me ? `🧑‍🎓 <b>${me.grade}학년 ${me.cls}반 ${esc(me.name)}</b> <button class="mp-reset lgLogout" type="button">나가기</button>` : '';
-    ['studentBox','gStudentBox'].forEach(id => { const el = $(id); if (el) el.innerHTML = html; });
-    document.querySelectorAll('.lgLogout').forEach(b => b.addEventListener('click', () => hubStudent.logout()));
+  function render(){   // 학생 이름은 textContent 로만 넣어요
+    ['studentBox','gStudentBox'].forEach(id => {
+      const el = $(id); if (!el) return;
+      el.replaceChildren(...(me ? ['🧑‍🎓 ', h('b', {text: `${me.grade}학년 ${me.cls}반 ${me.name}`}), ' ',
+        h('button', {class: 'mp-reset lgLogout', type: 'button', text: '나가기', onclick: () => hubStudent.logout()})] : []));
+    });
   }
   render();
   return { get me(){ return me; }, open(){}, key: () => me ? `${me.grade}-${me.cls}-${me.name}` : 'guest' };
@@ -2281,50 +2208,53 @@ const PRE_QUIZ = [
    expl: '기상 요소를 이용하면 날씨를 비교적 자세하고 알기 쉽게 나타낼 수 있어요.'},
 ];
 const PreQuiz = (() => {
-  const $ = id => document.getElementById(id);
-  let idx = 0, order = [], onPass = null, curKey = '';
+  let idx = 0, order = [], onPass = null, curKey = '', m = null, els = null;
   const passedKey = k => 'wx-prequiz-' + k;
   function alreadyPassed(k){ return !!store.get(passedKey(k), false); }
   function start(studentKey, cb){
     curKey = studentKey; onPass = cb; idx = 0;
     order = shuffle(PRE_QUIZ.map((_,i) => i));
-    $('pqIntro').textContent = `미션을 시작하기 전에 기상 요소에 대한 문제 ${order.length}개를 먼저 풀어 볼까요? 정답을 맞혀야 다음 문제로 넘어가요.`;
-    $('preQuizModal').hidden = false;
+    els = {progress: h('div', {class: 'jua wx-pq-progress'}), q: h('div', {class: 'qq'}), choices: h('div', {class: 'qch'}), msg: h('div', {class: 'qmsg', id: 'pqMsg'})};
+    els.choices.addEventListener('click', choose);
+    // 정답을 맞혀야 넘어가므로 바깥 누르기·Esc 로 닫히지 않게 해요. 학생 화면이면 큰 글자
+    m = openModal({title: '🌦️ 기상 요소, 얼마나 알고 있나요?', dismissible: false, large: STUDENT_MODE, body: [h('div', {class: 'wx-dlg'},
+      h('p', {text: `미션을 시작하기 전에 기상 요소에 대한 문제 ${order.length}개를 먼저 풀어 볼까요? 정답을 맞혀야 다음 문제로 넘어가요.`}),
+      els.progress, els.q, els.choices, els.msg)]});
     render();
   }
   function render(){
     const item = PRE_QUIZ[order[idx]];
     const chOrder = item.ch.map((_,i) => i).sort(() => Math.random() - .5);
-    $('pqProgress').textContent = `${idx+1} / ${order.length}번째 문제`;
-    $('pqQ').innerHTML = (item.img || '') + `<div>${esc(item.q)}</div>`;
-    $('pqChoices').innerHTML = chOrder.map((k,n) => `<button class="qbtn" data-k="${k}">${'①②③④'[n]} ${esc(item.ch[k])}</button>`).join('');
-    $('pqMsg').innerHTML = '';
+    els.progress.textContent = `${idx+1} / ${order.length}번째 문제`;
+    els.q.replaceChildren(...(item.img ? [h('img', {class: 'wx-pq-img', src: item.img, alt: '구름이 하늘을 가득 덮은 흐린 하늘 사진'})] : []), h('div', {text: item.q}));
+    els.choices.replaceChildren(...chOrder.map((k,n) => h('button', {class: 'qbtn', type: 'button', 'data-k': k, text: `${'①②③④'[n]} ${item.ch[k]}`})));
+    els.msg.replaceChildren();
   }
   function finish(){
     store.set(passedKey(curKey), true);
-    $('preQuizModal').hidden = true;
+    m.close(); m = null;
     const cb = onPass; onPass = null;
     if (cb) cb();
   }
-  $('pqChoices').addEventListener('click', ev => {
+  function choose(ev){
     const b = ev.target.closest('button'); if (!b || b.disabled) return;
     const k = +b.dataset.k;
     if (k !== 0){
       b.classList.add('wrong'); b.disabled = true;
-      $('pqMsg').innerHTML = '🤔 다시 생각해 보세요!';
+      els.msg.textContent = '🤔 다시 생각해 보세요!';
       return;
     }
-    document.querySelectorAll('#pqChoices button').forEach(x => x.disabled = true);
+    els.choices.querySelectorAll('button').forEach(x => x.disabled = true);
     b.classList.add('right');
     const last = idx + 1 >= order.length;
-    $('pqMsg').innerHTML = `<div class="hint">📘 ${PRE_QUIZ[order[idx]].expl}</div>
-      <div class="mc-btns" style="margin-top:8px"><button class="btn-make" id="pqNext">${last ? '미션 시작하기 🎉' : '다음 문제 ▶'}</button></div>`;
-    $('pqNext').addEventListener('click', () => {
+    const next = h('button', {class: 'btn-make', type: 'button', text: last ? '미션 시작하기 🎉' : '다음 문제 ▶', onclick: () => {
       idx++;
       if (idx >= order.length) finish();
       else render();
-    });
-  });
+    }});
+    els.msg.replaceChildren(h('div', {class: 'hint', text: '📘 ' + PRE_QUIZ[order[idx]].expl}), h('div', {class: 'mc-btns'}, next));
+    next.focus();
+  }
   return { alreadyPassed, start };
 })();
 
@@ -2333,195 +2263,82 @@ const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString
 
 const isGuessSet = sid => sid === GUESS_SET_ID;
 const Rank = (() => {
-  const $ = id => document.getElementById(id);
   const PAGE_SIZE = 20;
-  let ctx = null, filter = 'class', schoolQ = '', nameQ = '', todayMode = false, page = 0;
-  let rankedRows = [];   // normal mode: full (school/filter-scoped) rows with rank assigned
-  let todayRawRows = []; // today mode: full raw rows for the day, before school/name filtering
-  let editRid = null;    // 이름/학교 수정 모달에서 지금 고치고 있는 기록의 rid
+  const FILTER_LABEL = {class: '우리 반', grade: '우리 학년', all: '선생님 반 전체'};
+  let ctx = null, filter = 'class', nameQ = '', page = 0, rankedRows = [], ui = null, nameTimer = null;
+  function build(){
+    const nameInput = h('input', {maxlength: '10', placeholder: '🔍 내 이름으로 검색 (예: 홍길동)', autocomplete: 'off', 'aria-label': '이름으로 검색'});
+    const applyName = () => { clearTimeout(nameTimer); nameQ = nameInput.value.trim(); page = 0; renderList(); };
+    nameInput.addEventListener('input', () => { clearTimeout(nameTimer); nameTimer = setTimeout(applyName, 400); });
+    nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') applyName(); });
+    const filterBar = h('div', {class: 'rk-filter', role: 'group', 'aria-label': '순위표 범위'},
+      Object.entries(FILTER_LABEL).map(([f, t]) => h('button', {type: 'button', 'data-f': f, text: t, onclick: () => { filter = f; load(); }})));
+    const u = {nameInput, filterBar, title: h('p', {class: 'rk-note'}), mine: h('div'), list: h('ol', {class: 'rk-list'}), pager: h('div', {class: 'rk-pager'}), note: h('div', {class: 'rk-note', text: '선생님 반 학생들의 기록을 모아 보여 줘요.'})};
+    u.body = h('div', {class: 'wx-dlg'}, u.title, u.mine,
+      h('div', {class: 'rk-search'}, nameInput, h('button', {class: 'btn-make', type: 'button', text: '검색', onclick: applyName})),
+      filterBar, u.list, u.pager, u.note);
+    return u;
+  }
   async function open(setId, setName, highlight, isAdmin){
     ctx = {setId, setName, highlight, isAdmin: !!isAdmin};
-    filter = Student.me ? 'class' : 'all';
-    schoolQ = ''; nameQ = ''; todayMode = false; page = 0;
-    $('rkSchoolQ').value = ''; $('rkNameQ').value = '';
-    $('rkToday').hidden = true;
-    $('rkToday').textContent = '📅 오늘 전체 기록 보기';
-    $('rkFilter').hidden = !Student.me;
-    $('rkTitle').textContent = (setName ? `「${setName}」 ` : '') + '점수가 같으면 더 빨리 끝낸 기록이 앞에 와요.';
-    $('rankModal').hidden = false;
+    filter = Student.me ? 'class' : 'all'; nameQ = ''; page = 0;
+    ui = build();
+    ui.filterBar.hidden = !Student.me;
+    ui.title.textContent = (setName ? `「${setName}」 ` : '') + '점수가 같으면 더 빨리 끝낸 기록이 앞에 와요.';
+    openModal({title: '🏆 순위표', wide: true, large: STUDENT_MODE, body: [ui.body], onClose: () => { ui = null; }});
     await load();
   }
   async function load(){
-    document.querySelectorAll('#rkFilter button').forEach(b => b.classList.toggle('on', b.dataset.f === filter));
-    $('rkFilter').hidden = !Student.me || todayMode;
-    $('rkList').innerHTML = '<li class="rk-sub">불러오는 중…</li>';
-    $('rkPager').hidden = true;
-    $('rkNote').textContent = todayMode
-      ? '미션 내용이 바뀌어도, 오늘 하루 동안 들어온 모든 날씨 미션·날씨 맞추기 기록을 한곳에 모아 보여 줘요.'
-      : (DB.online ? '선생님 반 학생들의 기록을 모아 보여 줘요.' : '⚠️ 지금은 이 기기에서 한 기록만 보여요. (선생님: Supabase를 연결하면 반 전체 순위를 볼 수 있어요)');
+    if (!ui) return;
+    ui.filterBar.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.f === filter));
+    ui.list.replaceChildren(loadingBox('순위표를 불러오는 중이에요'));
+    ui.pager.hidden = true;
     let rows;
-    try { rows = todayMode ? await DB.listToday() : await DB.list(ctx.setId, filter, Student.me, schoolQ); }
-    catch(e){ $('rkList').innerHTML = `<li class="rk-sub">순위표를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</li>`; return; }
-
-    if (todayMode){
-      todayRawRows = rows;
-      renderToday();
-      return;
-    }
+    try { rows = await DB.list(ctx.setId, filter); }
+    catch(e){ if (ui) ui.list.replaceChildren(errorBox(e.message && e.name === 'HubError' ? e.message : '순위표를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.', load)); return; }
+    if (!ui) return;
     let prevKey = null, rank = 0;
     rankedRows = rows.map((r,i) => { const k = r.score + '|' + r.duration_sec; if (k !== prevKey){ rank = i+1; prevKey = k; } return {...r, rank}; });
     page = 0;
-    renderNormal();
+    renderList();
   }
-  function renderToday(){
-    const q = schoolQ.trim(), nq = nameQ.trim();
-    const rows = todayRawRows.filter(r => (!q || (r.school||'').includes(q)) && (!nq || (r.name||'').includes(nq)));
-    $('rkMine').innerHTML = '';
-    $('rkPager').hidden = true;
-    $('rkList').innerHTML = rows.length ? rows.slice(0, 200).map(r => {
-      const isGuess = isGuessSet(r.set_id);
-      /* 관리자가 '날씨 미션' 화면을 둘러보면 자동으로 미리보기 모드에 들어가서
-         Mission.setId가 임시값 'preview'로 바뀐 채 남아 있을 수 있어요. 그 상태에서
-         그대로 비교하면 멀쩡한 오늘자 기록까지 전부 '예전 버전'으로 잘못 보이니,
-         미리보기 중이면 실제 미션 기준값(missionSetId(Teacher.setName))으로 비교해요. */
-      const target = '';
-      const stale = false;
-      return `
-      <li class="rk-item ${ctx.isAdmin ? 'admin' : ''}" data-rid="${esc(r.rid||'')}" data-target="${esc(target)}">
-        <span class="rk-no">${isGuess ? '🔍' : '🎯'}</span>
-        <div><div class="rk-name">${esc(r.name)}</div><div class="rk-sub">${r.school ? esc(r.school) + ' · ' : ''}${r.grade}학년 ${r.class_no}반 · ${esc(r.set_name || (isGuess ? '날씨 맞추기' : '날씨 미션'))} · ${new Date(r.created_at).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}${stale ? ' · <span style="color:var(--ap-red)">예전 버전</span>' : ''}</div></div>
-        <span class="rk-score">${r.score}<small style="font-size:13px;color:var(--sub)"> / ${r.max_score}</small></span>
-        <span class="rk-act">${stale ? `<button type="button" data-act="merge" title="지금 순위표로 합치기">➕</button>` : ''}${ctx.isAdmin ? `<button type="button" class="del" data-act="del" title="기록 삭제">🗑</button>` : ''}</span>
-      </li>`;
-    }).join('') : '<li class="rk-sub">오늘 아직 활동한 기록이 없어요.</li>';
+  // 학생 이름·세트 이름은 모두 textContent 로 넣어요
+  function row(r){
+    const isMe = r.mine || (!!ctx.highlight && r.rid === ctx.highlight);   // 기록 번호가 없는 줄끼리 '내 기록'으로 잘못 칠해지지 않게
+    const act = ctx.isAdmin && r.rid ? h('span', {class: 'rk-act'}, h('button', {type: 'button', class: 'del', title: '기록 삭제', 'aria-label': `${r.name} 기록 삭제`, text: '🗑', onclick: (e) => remove(r, e.currentTarget)})) : null;
+    return h('li', {class: `rk-item${ctx.isAdmin ? ' admin' : ''}${isMe ? ' me' : ''}`},
+      h('span', {class: 'rk-no', text: r.rank <= 3 ? ['🥇','🥈','🥉'][r.rank-1] : String(r.rank)}),
+      h('div', {}, h('div', {class: 'rk-name', text: r.name}),
+        h('div', {class: 'rk-sub', text: `${r.grade}학년 ${r.class_no}반 · ${fmtTime(r.duration_sec)} · ${new Date(r.created_at).toLocaleDateString('ko-KR', {month: 'numeric', day: 'numeric'})}`})),
+      h('span', {class: 'rk-score'}, String(r.score), h('small', {text: ` / ${r.max_score}`})),
+      act);
   }
-  function renderNormal(){
-    const nq = nameQ.trim();
-    const visible = nq ? rankedRows.filter(r => (r.name||'').includes(nq)) : rankedRows;
+  function renderList(){
+    if (!ui) return;
+    const nq = nameQ;
+    const visible = nq ? rankedRows.filter(r => (r.name || '').includes(nq)) : rankedRows;
     const totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
-    if (page >= totalPages) page = totalPages - 1;
-    if (page < 0) page = 0;
+    page = Math.min(Math.max(page, 0), totalPages - 1);
     const pageRows = visible.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
-
-    const mine = rankedRows.find(r => r.mine || r.rid === ctx.highlight) || (nq && visible.length === 1 ? visible[0] : null);
-    let qLabel = '';
-    if (schoolQ && nameQ) qLabel = `"${esc(schoolQ)}·${esc(nameQ)}" 검색`;
-    else if (schoolQ) qLabel = `"${esc(schoolQ)}" 검색`;
-    else if (nameQ) qLabel = `"${esc(nameQ)}" 검색`;
-    $('rkMine').innerHTML = mine ? `<div class="myrank">🎉 내 기록: <b>${mine.score}점</b> (${fmtTime(mine.duration_sec)}) · ${qLabel || {class:'우리 반',grade:'우리 학년',school:'우리학교',any:'전체 학교'}[filter]} <b>${mine.rank}등</b> / ${rankedRows.length}명</div>` : '';
-
-    /* '전체 학교'로 볼 때는 내 학교가 아닌 다른 학교는 학교 이름(🏫 아이콘)과 반 번호를
-       가려요. 학년은 그대로 보여줘요(예: 🏫🏫초등학교 · 5학년 🏫반). */
-    $('rkList').innerHTML = pageRows.length ? pageRows.map(r => {
-      const isOther = filter === 'any' && Student.me && r.school && r.school !== Student.me.school;
-      const showSchool = isOther ? maskSchool(r.school) : r.school;
-      const showClass = isOther ? '🏫' : r.class_no;
-      return `
-      <li class="rk-item ${ctx.isAdmin ? 'admin' : ''} ${(r.mine || r.rid === ctx.highlight) ? 'me' : ''}" data-rid="${esc(r.rid||'')}">
-        <span class="rk-no">${r.rank <= 3 ? ['🥇','🥈','🥉'][r.rank-1] : r.rank}</span>
-        <div><div class="rk-name">${esc(r.name)}</div><div class="rk-sub">${showSchool ? esc(showSchool) + ' · ' : ''}${r.grade}학년 ${showClass}반 · ${fmtTime(r.duration_sec)} · ${new Date(r.created_at).toLocaleDateString('ko-KR',{month:'numeric',day:'numeric'})}</div></div>
-        <span class="rk-score">${r.score}<small style="font-size:13px;color:var(--sub)"> / ${r.max_score}</small></span>
-        ${ctx.isAdmin ? `<span class="rk-act"><button type="button" class="del" data-act="del" title="기록 삭제">🗑</button></span>` : ''}
-      </li>`;
-    }).join('') : (nq ? `<li class="rk-sub">"${esc(nq)}" 이름을 찾지 못했어요.</li>` : '<li class="rk-sub">아직 기록이 없어요. 미션을 모두 끝내면 기록이 올라가요.</li>');
-
-    if (visible.length > PAGE_SIZE){
-      $('rkPager').hidden = false;
-      $('rkPager').innerHTML = `<button type="button" id="rkPrev" ${page === 0 ? 'disabled' : ''}>◀ 이전</button><span>${page+1} / ${totalPages} 페이지 (${visible.length}명)</span><button type="button" id="rkNext" ${page >= totalPages-1 ? 'disabled' : ''}>다음 ▶</button>`;
-    } else {
-      $('rkPager').hidden = true;
-    }
+    const mine = rankedRows.find(r => r.mine || (!!ctx.highlight && r.rid === ctx.highlight)) || (nq && visible.length === 1 ? visible[0] : null);
+    ui.mine.replaceChildren(...(mine ? [h('div', {class: 'myrank'}, '🎉 내 기록: ', h('b', {text: `${mine.score}점`}),
+      ` (${fmtTime(mine.duration_sec)}) · ${nq ? `"${nq}" 검색` : FILTER_LABEL[filter] || ''} `, h('b', {text: `${mine.rank}등`}), ` / ${rankedRows.length}명`)] : []));
+    ui.list.replaceChildren(...(pageRows.length ? pageRows.map(row)
+      : [h('li', {class: 'rk-sub', text: nq ? `"${nq}" 이름을 찾지 못했어요.` : '아직 기록이 없어요. 미션을 모두 끝내면 기록이 올라가요.'})]));
+    ui.pager.hidden = visible.length <= PAGE_SIZE;
+    if (!ui.pager.hidden) ui.pager.replaceChildren(
+      h('button', {type: 'button', text: '◀ 이전', disabled: page === 0, onclick: () => { page--; renderList(); }}),
+      h('span', {text: `${page+1} / ${totalPages} 페이지 (${visible.length}명)`}),
+      h('button', {type: 'button', text: '다음 ▶', disabled: page >= totalPages - 1, onclick: () => { page++; renderList(); }}));
   }
-  $('rkPager').addEventListener('click', e => {
-    const b = e.target.closest('button'); if (!b) return;
-    if (b.id === 'rkPrev' && page > 0){ page--; renderNormal(); }
-    else if (b.id === 'rkNext'){ page++; renderNormal(); }
-  });
-  $('rkToday').addEventListener('click', () => {
-    todayMode = !todayMode;
-    $('rkToday').textContent = todayMode ? '🏆 이 미션 순위표로 보기' : '📅 오늘 전체 기록 보기';
-    load();
-  });
-  $('rkList').addEventListener('click', async ev => {
-    const b = ev.target.closest('button[data-act]'); if (!b) return;
-    const li = b.closest('.rk-item'); const rid = li && li.dataset.rid;
-    if (!rid) return;
-    if (b.dataset.act === 'edit'){
-      const rec = (todayMode ? todayRawRows : rankedRows).find(r => r.rid === rid);
-      const nameEl = li.querySelector('.rk-name');
-      editRid = rid;
-      $('erName').value = nameEl ? nameEl.textContent : (rec ? rec.name : '');
-      $('erSchool').value = rec ? (rec.school || '') : '';
-      $('erMsg').textContent = '';
-      $('editRecModal').hidden = false;
-      setTimeout(() => { $('erName').focus(); $('erName').select(); }, 50);
-      return;
-    }
-    if (b.dataset.act === 'del'){
-      if (!confirm('이 기록을 삭제할까요? 되돌릴 수 없어요.')) return;
-      b.disabled = true;
-      try { await DB.remove(rid); await load(); }
-      catch(e){ alert('삭제하지 못했어요. ' + (e.message || '')); b.disabled = false; }
-      return;
-    }
-    if (b.dataset.act === 'merge'){
-      const target = li.dataset.target;
-      if (!target) return;
-      b.disabled = true;
-      try { await DB.update(rid, {set_id: target}); await load(); }
-      catch(e){ alert('합치지 못했어요. ' + (e.message || '')); b.disabled = false; }
-    }
-  });
-  $('rkFilter').addEventListener('click', e => { const b = e.target.closest('button'); if (b){ filter = b.dataset.f; load(); } });
-  function applySchoolChange(v){
-    schoolQ = v;
-    if (todayMode) renderToday(); else load(); // 학교 검색은 일반 모드에선 서버 쪽에서 다시 가져와야 해요.
+  async function remove(r, b){
+    if (!(await ask({title: '이 기록을 지울까요?', text: `${r.grade}학년 ${r.class_no}반 ${r.name} 학생의 기록이에요. 지우면 되돌릴 수 없어요.`, ok: '지우기', danger: true}))) return;
+    b.disabled = true;
+    try { await DB.remove(r.rid); await load(); }
+    catch(e){ b.disabled = false; await ask({title: '지우지 못했어요', text: (e.message || '') + ' 잠시 뒤 다시 해 주세요.', info: true}); }
   }
-  function applyNameChange(v){
-    nameQ = v;
-    if (todayMode) renderToday(); else { page = 0; renderNormal(); } // 이름 검색은 이미 받아온 자료 안에서 순위를 그대로 찾아요.
-  }
-  let schoolTimer = null;
-  $('rkSchoolQ').addEventListener('input', () => {
-    clearTimeout(schoolTimer);
-    schoolTimer = setTimeout(() => applySchoolChange($('rkSchoolQ').value.trim()), 400);
-  });
-  $('rkSchoolQ').addEventListener('keydown', e => { if (e.key === 'Enter'){ clearTimeout(schoolTimer); applySchoolChange($('rkSchoolQ').value.trim()); } });
-  $('rkSchoolClear').addEventListener('click', () => { $('rkSchoolQ').value = ''; applySchoolChange(''); });
-  let nameTimer = null;
-  $('rkNameQ').addEventListener('input', () => {
-    clearTimeout(nameTimer);
-    nameTimer = setTimeout(() => applyNameChange($('rkNameQ').value.trim()), 400);
-  });
-  $('rkNameQ').addEventListener('keydown', e => { if (e.key === 'Enter'){ clearTimeout(nameTimer); applyNameChange($('rkNameQ').value.trim()); } });
-  $('rkNameSearch').addEventListener('click', () => { clearTimeout(nameTimer); applyNameChange($('rkNameQ').value.trim()); });
-  $('rkClose').addEventListener('click', () => $('rankModal').hidden = true);
-  $('rankModal').addEventListener('click', e => { if (e.target.id === 'rankModal') $('rankModal').hidden = true; });
-
-  /* 이름/학교 수정 모달: 하나의 창에서 이름·학교를 같이 고치고 바로 저장해요. */
-  function closeEditModal(){ $('editRecModal').hidden = true; editRid = null; }
-  async function saveEdit(){
-    if (!editRid) return;
-    const name = $('erName').value.trim().replace(/\s+/g, ' ');
-    const school = $('erSchool').value.trim().replace(/\s+/g, ' ');
-    if (!name){ $('erMsg').textContent = '이름을 입력해 주세요.'; $('erName').focus(); return; }
-    $('erSave').disabled = true; $('erMsg').textContent = '';
-    try {
-      await DB.update(editRid, {name, school: school || null});
-      closeEditModal();
-      await load();
-    } catch(e){ $('erMsg').textContent = '수정하지 못했어요. ' + (e.message || ''); }
-    $('erSave').disabled = false;
-  }
-  $('erSave').addEventListener('click', saveEdit);
-  $('erCancel').addEventListener('click', closeEditModal);
-  $('editRecModal').addEventListener('click', e => { if (e.target.id === 'editRecModal') closeEditModal(); });
-  $('erName').addEventListener('keydown', e => { if (e.key === 'Enter') $('erSchool').focus(); });
-  $('erSchool').addEventListener('keydown', e => { if (e.key === 'Enter') saveEdit(); });
-
   return {open};
 })();
-
 
 /* =========================================================
    9. 날씨 맞추기 (정보를 보고 날씨 알아맞히기)
@@ -2573,12 +2390,12 @@ const Guess = (() => {
      이전 학생이 풀던 중간 상태가 아니라 완전히 새 판에서 시작하도록. */
   function leave(){ started = false; finished = false; }
 
-  function restart(){
+  async function restart(){
     if (!finished){
-      alert('문제를 모두 끝내야 다시해볼 수 있습니다.');
+      await ask({title: '아직 다시 할 수 없어요', text: '문제를 모두 끝내야 다시 해 볼 수 있어요.', info: true, large: STUDENT_MODE});
       return;
     }
-    if (!confirm('처음부터 다시 도전할까요? 새로운 문제로 다시 시작해요.')) return;
+    if (!(await ask({title: '처음부터 다시 도전할까요?', text: '새로운 문제로 다시 시작해요.', ok: '다시 하기', large: STUDENT_MODE}))) return;
     start();
   }
 
@@ -2963,7 +2780,7 @@ const Mission = (() => {
     const ok = await DB.add(rec);
     renderMissionUI();
     setTimeout(async () => Rank.open(setId, setName, prog._sent, await Admin.ensureIn()), ok ? 1600 : 1600);
-    if (!ok) alert('인터넷 연결이 불안정해서 기록을 아직 보내지 못했어요. 다음에 접속하면 다시 보낼게요.');
+    if (!ok && hubStudent) ask({title: '기록을 아직 보내지 못했어요', text: '인터넷 연결이 불안정해요. 다음에 접속하면 다시 보낼게요.', info: true, large: true});
   }
   async function openRank(){
     /* 관리자 미리보기 중에는 setId/setName이 임시 'preview' 값이라, 실제 미션의
@@ -2986,12 +2803,12 @@ const Mission = (() => {
   document.getElementById('result').addEventListener('click', ev => { if (ev.target.closest('[data-rank]')) openRank(); });
 
   /* 1단계부터 다시: 미션 중 '처음으로' 버튼을 누르면 사용. 횟수 제한은 없어요 */
-  function resetAll(){
+  async function resetAll(){
     if (!isAllDone()){
-      alert('문제를 모두 끝내야 다시해볼 수 있습니다.');
+      await ask({title: '아직 다시 할 수 없어요', text: '문제를 모두 끝내야 다시 해 볼 수 있어요.', info: true, large: STUDENT_MODE});
       return;
     }
-    if (!confirm('1단계부터 다시 도전할까요? 지금까지의 점수는 지워지지만, 이미 올라간 순위 기록은 그대로 남아요.')) return;
+    if (!(await ask({title: '1단계부터 다시 도전할까요?', text: '지금까지의 점수는 지워지지만, 이미 올라간 순위 기록은 그대로 남아요.', ok: '다시 하기', large: STUDENT_MODE}))) return;
     store.remove(orderKey);      // 문제 구성과 순서를 새로 랜덤하게 뽑아서, 외워서 푸는 것을 막아요
     list = buildList();
     prog = {}; quiz = null; store.set(progKey, prog); autoSelect(); resetBoard(); renderMissionUI();
@@ -3085,12 +2902,12 @@ const Teacher = (() => {
     if (b.dataset.a === 'down' && i<draft.length-1) [draft[i+1], draft[i]] = [draft[i], draft[i+1]];
     save(); render();
   });
-  $('tDefault').addEventListener('click', () => {
-    if (draft.length && !confirm('지금 목록을 기본 미션 9개로 바꿀까요?')) return;
+  $('tDefault').addEventListener('click', async () => {
+    if (draft.length && !(await ask({title: '기본 미션으로 바꿀까요?', text: '지금 목록을 기본 미션 9개로 바꿔요.', ok: '바꾸기'}))) return;
     draft = sanitize(DEFAULT_MISSIONS); save(); render();
   });
-  $('tClear').addEventListener('click', () => {
-    if (!draft.length || !confirm('미션 목록을 모두 지울까요?')) return;
+  $('tClear').addEventListener('click', async () => {
+    if (!draft.length || !(await ask({title: '미션 목록을 모두 지울까요?', text: '지운 목록은 되돌릴 수 없어요.', ok: '모두 지우기', danger: true}))) return;
     draft = []; save(); render();
   });
 
@@ -3115,7 +2932,7 @@ const Admin = (() => {
 const Sets = (() => {
   const $ = id => document.getElementById(id);
   let rows = [];
-  let sel = (() => { try { return localStorage.getItem('wx-sel-set') || ''; } catch(e){ return ''; } })();
+  let sel = store.get('wx-sel-set', '') || '';
   const draftSet = () => ({id: 'draft', name: Teacher.setName || '(편집 중인 초안)', missions: Teacher.draft, is_published: false});
   const isUuid = v => typeof v === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
   function current(){
@@ -3133,21 +2950,22 @@ const Sets = (() => {
     renderSel();
   }
   function renderSel(){
-    const opts = rows.map(r => `<option value="${r.id}">${esc(r.name)} (${r.missions.length}문제${IS_ADMIN ? (r.is_published ? ', 공개' : ', 비공개') : ''})</option>`);
-    if (IS_ADMIN) opts.unshift('<option value="draft">✏️ 편집 중인 초안 (저장 전)</option>');
-    $('setSel').innerHTML = opts.join('') || '<option value="">공개된 미션이 아직 없어요</option>';
+    const opt = (value, text) => h('option', {value, text});
+    const opts = rows.map(r => opt(r.id, `${r.name} (${r.missions.length}문제${IS_ADMIN ? (r.is_published ? ', 공개' : ', 비공개') : ''})`));
+    if (IS_ADMIN) opts.unshift(opt('draft', '✏️ 편집 중인 초안 (저장 전)'));
+    $('setSel').replaceChildren(...(opts.length ? opts : [opt('', '공개된 미션이 아직 없어요')]));
     $('setSel').value = sel;
-    $('sSel').innerHTML = '<option value="">(새 세트로 저장)</option>' + rows.map(r => `<option value="${r.id}">${esc(r.name)}</option>`).join('');
+    $('sSel').replaceChildren(opt('', '(새 세트로 저장)'), ...rows.map(r => opt(r.id, r.name)));
     $('setInfo').textContent = rows.length || IS_ADMIN ? '' : '관리자가 미션을 공개하면 여기에 나타나요. 학생은 지금 “날씨 맞추기”와 자유 탐구를 할 수 있어요.';
   }
   const id = () => current().id, name = () => current().name;
-  $('setSel').addEventListener('change', () => { sel = $('setSel').value; try { localStorage.setItem('wx-sel-set', sel); } catch(e){} });
+  $('setSel').addEventListener('change', () => { sel = $('setSel').value; store.set('wx-sel-set', sel); });
   async function invite(contentId, title){
-    if (!isUuid(contentId)) return alert('먼저 미션 세트를 저장(관리자) 하거나 공개된 세트를 골라 주세요.');
+    if (!isUuid(contentId)) return ask({title: '미션 세트를 먼저 골라 주세요', text: '먼저 미션 세트를 저장(관리자) 하거나 공개된 세트를 골라 주세요.', info: true});
     await hub.recordActivity({appSlug: APP_SLUG, contentId, title: title.slice(0, 100), url: '/games/weather/'});
     hub.openInvite({appSlug: APP_SLUG, contentId, title});
   }
-  $('btnInviteApp').addEventListener('click', () => invite(APP_CONTENT_ID, '기상요소로 날씨 만들기'));
+  $('btnInviteApp').addEventListener('click', () => invite(APP_ENTRY_ID, '기상요소로 날씨 만들기'));
 
   /* 관리자: 세트 저장·불러오기·삭제 */
   const smsg = (t, cls) => { const m = $('sMsg'); m.textContent = t; m.className = 'tmsg ' + (cls || ''); };
@@ -3166,13 +2984,13 @@ const Sets = (() => {
     const q = cur ? hub.sb.from('weather_mission_sets').update(body).eq('id', cur).select('id') : hub.sb.from('weather_mission_sets').insert({...body, owner_id: hub.user.id}).select('id');
     const {data, error} = await q;
     if (error || !data || !data.length) return smsg('저장하지 못했어요. ' + (error ? error.message : ''), 'err');
-    sel = data[0].id; try { localStorage.setItem('wx-sel-set', sel); } catch(e){}
+    sel = data[0].id; store.set('wx-sel-set', sel);
     await refresh(); $('sSel').value = sel;
     smsg('저장했어요.' + ($('sPub').checked ? ' (공개)' : ' (비공개)'), 'ok');
   });
   $('sDel').addEventListener('click', async () => {
     const cur = $('sSel').value; if (!cur) return smsg('지울 세트를 먼저 불러와 주세요.', 'err');
-    if (!confirm('이 미션 세트를 지울까요? 이미 나눠 준 링크로는 더 이상 열 수 없어요.')) return;
+    if (!(await ask({title: '이 미션 세트를 지울까요?', text: '이미 나눠 준 링크로는 더 이상 열 수 없어요.', ok: '지우기', danger: true}))) return;
     const {error} = await hub.sb.from('weather_mission_sets').delete().eq('id', cur);
     if (error) return smsg('지우지 못했어요.', 'err');
     await refresh(); smsg('지웠어요.', 'ok');
@@ -3181,8 +2999,8 @@ const Sets = (() => {
 })();
 
 /* =========================================================
-   7-2b. 교사 모드: 학생 명단 전체와 참여 여부. 명단은 쌤허브 공통 명단(students)을 RLS로 읽고,
-         이름 고치기·삭제도 같은 명단에 그대로 반영돼요. 기록은 자기 학생 것만 읽혀요.
+   7-2b. 교사 모드: 학생 명단 전체와 참여 여부. 명단은 쌤허브 공통 명단(students)을 RLS로 읽기만 해요.
+         학생 추가·이름 고치기·지우기는 쌤허브 "학생 명단" 화면에서. 기록은 자기 학생 것만 읽혀요.
    ========================================================= */
 const Roster = (() => {
   const $ = id => document.getElementById(id);
@@ -3210,38 +3028,21 @@ const Roster = (() => {
   function render(){
     const keys = [...new Set(students.map(x => `${x.grade}-${x.class_no}`))];
     if (cls !== 'all' && !keys.includes(cls)) cls = 'all';
-    $('rosterClass').innerHTML = '<option value="all">전체 반</option>' + keys.map(k => { const [g, c] = k.split('-'); return `<option value="${k}">${g}학년 ${c}반</option>`; }).join('');
+    $('rosterClass').replaceChildren(h('option', {value: 'all', text: '전체 반'}), ...keys.map(k => { const [g, c] = k.split('-'); return h('option', {value: k, text: `${g}학년 ${c}반`}); }));
     $('rosterClass').value = cls;
     const rows = students.filter(x => cls === 'all' || `${x.grade}-${x.class_no}` === cls);
     const done = rows.filter(x => stat.has(x.id)).length;
     $('rosterSum').textContent = rows.length ? `참여 ${done}명 / 전체 ${rows.length}명 (아직 ${rows.length - done}명)` : '';
-    const cell = v => v ? `<span class="yes">✅ ${v.score}/${v.max_score}점</span>` : '–';
-    $('rosterBody').innerHTML = rows.map(x => {
+    const cell = v => h('td', {}, v ? h('span', {class: 'yes', text: `✅ ${v.score}/${v.max_score}점`}) : '–');
+    // 학생 이름은 textContent 로만 넣어요. 명단 고치기는 쌤허브 학생 명단에서(이 앱은 읽기만)
+    $('rosterBody').replaceChildren(...(rows.length ? rows.map(x => {
       const st = stat.get(x.id);
-      return `<tr class="${st ? '' : 'none'}"><td>${x.grade}-${x.class_no}</td><td>${esc(x.name)}</td><td>${cell(st && st.mission)}</td><td>${cell(st && st.guess)}</td>` +
-        `<td>${st ? day(st.last) + ` (${st.n}회)` : '아직 안 했어요'}</td>` +
-        `<td><button type="button" data-act="rename" data-id="${x.id}">이름 고치기</button> <button type="button" data-act="del" data-id="${x.id}">삭제</button></td></tr>`;
-    }).join('') || '<tr><td colspan="6" style="color:var(--sub)">등록된 학생이 없어요. 쌤허브의 학생 명단에서 먼저 등록해 주세요.</td></tr>';
+      return h('tr', {class: st ? '' : 'none'}, h('td', {text: `${x.grade}-${x.class_no}`}), h('td', {text: x.name}),
+        cell(st && st.mission), cell(st && st.guess), h('td', {text: st ? `${day(st.last)} (${st.n}회)` : '아직 안 했어요'}));
+    }) : [h('tr', {}, h('td', {colspan: '5', class: 'rk-sub', text: '등록된 학생이 없어요. 쌤허브의 학생 명단에서 먼저 등록해 주세요.'}))]));
   }
   $('rosterClass').addEventListener('change', () => { cls = $('rosterClass').value; render(); });
   $('rosterReload').addEventListener('click', load);
-  $('rosterBody').addEventListener('click', async e => {
-    const b = e.target.closest('button[data-act]'); if (!b) return;
-    const x = students.find(v => v.id === b.dataset.id); if (!x) return;
-    if (b.dataset.act === 'rename'){
-      const nm = (prompt(`${x.grade}학년 ${x.class_no}반 ${x.name}\n새 이름을 써 주세요. (쌤허브 명단과 모든 앱에 함께 바뀌어요)`, x.name) || '').trim();
-      if (!nm || nm === x.name) return;
-      if (nm.length > 50) return msg('이름은 50자까지 쓸 수 있어요.', 'err');
-      const {data, error} = await hub.sb.from('students').update({name: nm}).eq('id', x.id).select('id');
-      if (error || !data || !data.length) return msg(error && error.code === '23505' ? '같은 반에 같은 이름의 학생이 이미 있어요.' : '이름을 고치지 못했어요.', 'err');
-      x.name = nm; render(); msg('이름을 고쳤어요. 쌤허브 명단에도 반영됐어요.', 'ok');
-    } else {
-      if (!confirm(`${x.grade}학년 ${x.class_no}반 ${x.name} 학생을 명단에서 지울까요?\n\n쌤허브 명단에서 완전히 지워지고, 이 학생의 기록이 날씨 게임뿐 아니라 다른 앱에서도 모두 함께 지워져요. 되돌릴 수 없어요.`)) return;
-      const {data, error} = await hub.sb.from('students').delete().eq('id', x.id).select('id');
-      if (error || !data || !data.length) return msg('지우지 못했어요.', 'err');
-      students = students.filter(v => v.id !== x.id); stat.delete(x.id); render(); msg('학생을 지웠어요.', 'ok');
-    }
-  });
   return {load};
 })();
 
@@ -3249,57 +3050,25 @@ const Roster = (() => {
    7-3. 앱 단위 초대로 들어온 학생이 미션 세트를 직접 고르는 창
    ========================================================= */
 const AppPick = (() => {
-  const $ = id => document.getElementById(id);
   let chosen = null;
-  async function call(body){
-    const r = await studentCall('weather-record', {session_token: hubStudent.token, ...body});
-    if (r.status === 401){ hubStudent.logout({reason: 'expired'}); throw new Error('expired'); }
-    return r;
-  }
-  async function choose(id, name){
-    const dlg = $('pickDlg');
-    dlg.querySelectorAll('button').forEach(b => b.disabled = true);
-    try {
-      const r = await call({action: 'set', content_id: id});
-      if (r.status !== 200){ alert(r.data.message || '미션을 불러오지 못했어요. 다시 해 주세요.'); dlg.querySelectorAll('button').forEach(b => b.disabled = false); return; }
-      chosen = {id, name: r.data.name};
-      Mission.fromLink = true;
-      Mission.load(sanitize(r.data.missions), r.data.name, id);
-      dlg.close('chosen');
-      askPreQuiz(() => Mission.reload());
-    } catch(e){ /* 세션이 끝난 경우는 위에서 처리했어요 */ }
-  }
+  // 앱 전체·수업 흐름으로 들어온 학생이 미션 세트를 고르는 화면(쌤허브 공통 pickContent). 세트가 하나면 바로 열려요
   async function open(){
-    const dlg = $('pickDlg');
-    dlg.innerHTML = '<h3>🎯 어떤 미션을 할까요?</h3><p>불러오는 중…</p>';
-    dlg.returnValue = '';
-    if (!dlg.open) dlg.showModal();
-    let sets = [];
-    try {
-      const r = await call({action: 'sets', content_id: APP_CONTENT_ID});
-      sets = r.status === 200 ? r.data.sets || [] : null;
-    } catch(e){ return; }
-    const list = document.createElement('div'); list.className = 'pick-list';
-    (sets || []).forEach(x => {
-      const b = document.createElement('button'); b.type = 'button';
-      b.innerHTML = `${esc(x.name)}<small>${x.count}문제</small>`;
-      if (chosen && chosen.id === x.id) b.style.borderColor = 'var(--accent)';
-      b.addEventListener('click', () => choose(x.id, x.name));
-      list.append(b);
-    });
-    const msg = sets === null ? '미션 목록을 불러오지 못했어요. 잠시 뒤 다시 해 주세요.'
-      : sets.length ? '하고 싶은 미션을 골라요.' : '아직 공개된 미션이 없어요. 자유 탐구나 날씨 맞추기를 해 보세요.';
-    dlg.innerHTML = `<h3>🎯 어떤 미션을 할까요?</h3><p>${msg}</p>`;
-    dlg.append(list);
-    const close = document.createElement('button'); close.type = 'button'; close.className = 'btn-sub'; close.style.width = '100%';
-    close.textContent = chosen ? '닫기' : '자유 탐구로 돌아가기';
-    close.addEventListener('click', () => dlg.close('cancel'));
-    dlg.append(close);
+    const root = h('div');
+    const m = openModal({title: '', large: true, body: [root], onClose: () => { if (!chosen && mode === 'mission') setMode('free'); }});
+    await pickContent({root, title: '🎯 어떤 미션을 할까요?', text: chosen ? '' : '하고 싶은 미션을 골라요.',
+      emptyTitle: '아직 고를 수 있는 미션이 없어요', emptyText: '자유 탐구나 날씨 맞추기를 해 보세요.',
+      load: async () => (await hubStudent.call('weather-record', {action: 'sets', content_id: APP_ENTRY_ID})).sets
+        .map(x => ({id: x.id, title: x.name, sub: `${x.count}문제${chosen && chosen.id === x.id ? ' · 지금 하는 미션' : ''}`})),
+      onPick: async (it) => {
+        const d = await hubStudent.call('weather-record', {action: 'set', content_id: it.id});   // 실패하면 고르기 화면에 오류 상자
+        chosen = {id: it.id, name: d.name};
+        Mission.fromLink = true;
+        Mission.load(sanitize(d.missions), d.name, it.id);
+        m.close();
+        askPreQuiz(() => Mission.reload());
+      }});
   }
-  $('pickDlg').addEventListener('close', () => {
-    if ($('pickDlg').returnValue !== 'chosen' && !chosen && mode === 'mission') setMode('free');
-  });
-  $('mpPick').addEventListener('click', open);
+  document.getElementById('mpPick').addEventListener('click', open);
   return {open, get chosen(){ return chosen; }};
 })();
 
@@ -3334,7 +3103,7 @@ document.querySelector('.tabs').addEventListener('click', async ev => {
 
 /* 화면 위쪽 '학생 초대 QR' 버튼: 교사 모드로 들어가지 않고 앱 전체 초대 링크·QR을 바로 만들어요.
    학생은 들어와서 자유 탐구·날씨 미션(세트 고르기)·날씨 맞추기를 직접 골라요. */
-const quickInvite = () => { if (hub) Sets.invite(APP_CONTENT_ID, '기상요소로 날씨 만들기'); };
+const quickInvite = () => { if (hub) Sets.invite(APP_ENTRY_ID, '기상요소로 날씨 만들기'); };
 document.getElementById('btnQuickInvite').addEventListener('click', quickInvite);
 
 /* 관리자 모드 안의 두 서브메뉴(미션 출제 / 점수 관리) 전환 */
@@ -3389,9 +3158,12 @@ function askPreQuiz(cb){   // 학생은 처음 한 번 기본 개념 문제를 �
 async function boot(){
   if (STUDENT_MODE){
     document.getElementById('tabTeacher').hidden = true;
-    const r = await studentCall('weather-record', {action: 'set', session_token: hubStudent.token, content_id: STUDENT_CONTENT});
-    if (r.status === 401){ hubStudent.logout({reason: 'expired'}); return; }
-    if (r.status !== 200){ document.body.innerHTML = `<main style="font:18px/1.6 system-ui,sans-serif;max-width:460px;margin:15vh auto;padding:0 20px"><p>${esc(r.data.message || '지금은 들어갈 수 없어요. 선생님께 확인해 주세요.')}</p></main>`; return; }
+    let r;
+    try { r = {data: await hubStudent.call('weather-record', {action: 'set'})}; }
+    catch(e){   // 입장 시간이 끝난 경우(401)는 공통 모듈이 입장 화면으로 보내요
+      document.body.replaceChildren(h('main', {class: 'wx-blocked'}, errorBox(e.message || '지금은 들어갈 수 없어요. 선생님께 확인해 주세요.', () => location.reload())));
+      return;
+    }
     if (r.data.mode === 'app'){   // 앱 단위 초대: 세 가지 활동을 모두 열어 두고, 학생이 직접 고르게 해요
       document.getElementById('mpPick').hidden = false;
       Mission.fromLink = true; Mission.load([], '', null);
