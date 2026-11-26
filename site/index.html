@@ -159,9 +159,9 @@
   /* ---------- tabs ---------- */
   .tabs{display:flex;gap:8px;justify-content:flex-end;margin:0 0 0 auto;flex-wrap:wrap}
   @media (max-width:760px){.tabs{margin:0 auto;justify-content:center}}
-  /* 앱 위쪽 메뉴: 글자 크기는 왼쪽 위 앱 이름표와 같게(--ss-appbadge-size, 기본 18px, 좁은 화면 16px까지) */
-  .tab{display:inline-flex;align-items:center;justify-content:center;gap:.3em;height:calc(1.8em + 8px);background:var(--ap-fill);color:var(--ink);border:0;box-shadow:none;padding:0 16px;font-size:var(--ss-appbadge-size,18px);line-height:1}
-  @media (max-width:720px){.tab{font-size:min(var(--ss-appbadge-size,18px),16px);padding:0 13px}}
+  /* 앱 위쪽 메뉴: 글자 크기는 왼쪽 위 앱 이름표와 같게(--ss-appbadge-size, 모든 앱 20px, 좁은 화면 16px) */
+  .tab{display:inline-flex;align-items:center;justify-content:center;gap:.3em;height:calc(1.8em + 8px);background:var(--ap-fill);color:var(--ink);border:0;box-shadow:none;padding:0 16px;font-size:var(--ss-appbadge-size,20px);line-height:1}
+  @media (max-width:720px){.tab{font-size:min(var(--ss-appbadge-size,20px),16px);padding:0 13px}}
   .tab.on{background:var(--ink);color:var(--card);box-shadow:none}
   .roster-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px}
   .roster-top select{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
