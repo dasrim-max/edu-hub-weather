@@ -7,8 +7,8 @@
 <!-- 쌤허브 기본 애플 스타일: theme.js(화면 색상) → tokens → components → 앱 CSS → fonts.css(쿠키런) → skin-apple.css -->
 <script src="/shared/ui/js/theme.js"></script>
 <script>
-  /* 쌤허브가 띄운 창(launch=hub, 틀 밖)이면 처음부터 앱 제목을 숨겨요. 앱 이름표는 앱 코드를 다 불러온 뒤에 뜨므로,
-     그 사이 예전 제목("기상 요소로 날씨 만들기")이 잠깐 보였다가 바뀌지 않게 해요. 판단 기준은 /shared/embed.js 의 isLaunchedFromHub 와 같아요 */
+  /* 쌤허브가 띄운 창(launch=hub, 틀 밖)이면 처음부터 이름표 자리를 비워요. 앱 이름표는 앱 코드를 다 불러온 뒤에 뜨므로,
+     그 사이 메뉴가 덜컥 움직이지 않게 해요(포털 theme.js 도 같은 일을 하게 되면 지워도 돼요). 판단 기준은 /shared/embed.js 의 isLaunchedFromHub 와 같아요 */
   (function () {
     try {
       var hub = new URLSearchParams(location.search).get("launch") === "hub" || sessionStorage.getItem("hub:launch") === "1";
@@ -39,13 +39,11 @@
   h1,h2,h3,.jua{font-family:var(--ss-font-display);font-weight:700;letter-spacing:-.01em}
   .wrap{max-width:1180px;margin:0 auto}
   header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:24px 0 18px;text-align:left}
-  header h1{margin:0;font-size:clamp(20px,2.6vw,32px);letter-spacing:-.5px;white-space:nowrap}
-  header h1 span{color:var(--accent)}
   .h1-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
   .qr-btn{display:inline-flex;align-items:center;gap:6px;font-size:15px;padding:7px 12px;border-radius:980px;white-space:nowrap;background:var(--accent);color:var(--accent-ink);box-shadow:none}
   .qr-btn[hidden]{display:none}
   @media (max-width:760px){header{justify-content:center;text-align:center} .h1-row{justify-content:center}}
-  /* 쌤허브가 띄운 앱 창: 왼쪽 위 앱 이름표 자리(--ss-appbadge-w × --ss-appbadge-h)를 비우고, 앱 제목은 이름표가 대신해요 */
+  /* 쌤허브가 띄운 앱 창: 왼쪽 위 앱 이름표 자리(--ss-appbadge-w × --ss-appbadge-h)를 비워요 */
   /* 메뉴와 이름표는 늘 같은 높이: 이름표는 위에서 10px, 높이 = 글자 1.8배(가운데 = 10px + 0.9배).
      메뉴 높이는 글자 1.8배 + 8px 이라, 위 여백 6px 이면 두 가운데 선이 겹쳐요 */
   html:is([data-ss-appbadge],.wx-hub) header{padding-left:var(--ss-appbadge-w,16px);padding-top:6px;min-height:var(--ss-appbadge-h,52px);align-items:flex-start}
@@ -346,7 +344,7 @@
 <div class="wrap">
   <header>
     <div class="h1-row">
-      <h1>기상 요소로 <span>날씨 만들기</span></h1>
+      <!-- 앱 이름은 쌤허브 앱 이름표가 보여 줘요(앱 화면에 앱 이름을 따로 넣지 않음). 이 줄에는 이름표가 없을 때만 'QR 생성' 버튼이 보여요 -->
       <button class="qr-btn" type="button" id="btnQuickInvite" hidden title="학생 초대 링크·QR 만들기" aria-label="학생 초대 링크·QR 만들기"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="currentColor"><path d="M3 3h8v8H3zm2 2v4h4V5zM13 3h8v8h-8zm2 2v4h4V5zM3 13h8v8H3zm2 2v4h4v-4zM6 6h2v2H6zm10 0h2v2h-2zM6 16h2v2H6zm7-3h2v2h-2zm4 0h4v2h-4zm-4 4h4v2h-2v2h-2zm6 0h2v4h-4v-2h2z"/></svg><span>QR 생성</span></button>
     </div>
     <nav class="tabs" role="tablist">
